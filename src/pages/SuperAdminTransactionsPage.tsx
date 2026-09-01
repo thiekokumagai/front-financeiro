@@ -141,7 +141,7 @@ export default function SuperAdminTransactionsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+    <div className="space-y-8 w-full max-w-none pb-12">
       {/* Header com Botão de Atualizar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

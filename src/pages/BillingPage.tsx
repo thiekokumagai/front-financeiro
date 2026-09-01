@@ -144,7 +144,7 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-8">
+    <div className="p-6 w-full max-w-none space-y-8">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 text-indigo-600 font-semibold text-xs uppercase tracking-wider mb-1">

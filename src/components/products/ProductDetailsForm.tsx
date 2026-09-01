@@ -3,16 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RichTextEditor } from "@/components/ui/richtexteditor";
 import type { CategoryList } from "@/types/category";
 
 export type ProductDetailsFormValues = {
   title: string;
   categoryId: string;
-  description?: string;
-  descriptionFormated?: string;
   price?: number;
-  promotionalPrice?: number;
   costPrice?: number;
 };
 
@@ -75,55 +71,13 @@ export function ProductDetailsForm({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição (Suporta HTML)</FormLabel>
-                  <FormControl>
-                    <RichTextEditor
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid gap-5 md:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="price"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Preço (Venda)</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
-                        <Input
-                          className="h-12 rounded-2xl bg-background pl-9"
-                          placeholder="0,00"
-                          value={field.value !== undefined ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(field.value) : ""}
-                          onChange={(e) => {
-                            const digits = e.target.value.replace(/\D/g, "");
-                            field.onChange(Number(digits) / 100);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="promotionalPrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Preço Promocional</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>

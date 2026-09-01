@@ -181,7 +181,7 @@ export default function OrderDetailsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-12 px-1.5 md:px-4">
+    <div className="w-full max-w-none space-y-6 pb-12 px-1.5 md:px-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
         <button 

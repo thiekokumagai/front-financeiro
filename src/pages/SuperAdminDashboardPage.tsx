@@ -49,7 +49,7 @@ export default function SuperAdminDashboardPage() {
     .reduce((sum, item) => sum + (Number(item.monthlyFee) || 150), 0);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="p-6 w-full max-w-none space-y-8">
       {/* Top Banner */}
       <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

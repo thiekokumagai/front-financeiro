@@ -27,7 +27,6 @@ const productSchema = z.object({
   title: z.string().min(1, "Informe o nome do produto."),
   categoryId: z.string().min(1, "Selecione uma categoria."),
   price: z.preprocess((val) => (val === "" || val === undefined ? undefined : Number(val)), z.number().min(0, "O preço deve ser maior ou igual a zero.").optional()),
-  promotionalPrice: z.preprocess((val) => (val === "" || val === undefined ? undefined : Number(val)), z.number().min(0, "O preço promocional deve ser maior ou igual a zero.").optional()),
   costPrice: z.preprocess((val) => (val === "" || val === undefined ? undefined : Number(val)), z.number().min(0, "O preço de custo deve ser maior ou igual a zero.").optional()),
   stock: z.preprocess((val) => (val === "" || val === undefined ? 0 : Number(val)), z.number().min(0, "O estoque deve ser maior ou igual a zero.")),
 });
@@ -44,7 +43,6 @@ export default function ProductDetailsPage() {
   const categories = categoriesQuery.data ?? [];
 
   const [isVisible, setIsVisible] = useState(true);
-  const [isBestSeller, setIsBestSeller] = useState(false);
   const [stockAdjQuantity, setStockAdjQuantity] = useState("");
   const [stockAdjType, setStockAdjType] = useState<"ADD" | "SUBTRACT" | "SET">("ADD");
   const [stockAdjObs, setStockAdjObs] = useState("");
@@ -55,7 +53,6 @@ export default function ProductDetailsPage() {
       title: "",
       categoryId: "",
       price: undefined,
-      promotionalPrice: undefined,
       costPrice: undefined,
       stock: 0,
     },
@@ -79,12 +76,10 @@ export default function ProductDetailsPage() {
         title: product.title,
         categoryId: product.categoryId,
         price: product.price,
-        promotionalPrice: product.promotionalPrice,
         costPrice: product.costPrice,
         stock: product.stock,
       });
       setIsVisible(product.isVisible ?? true);
-      setIsBestSeller(product.isBestSeller ?? false);
     }
   }, [product, form]);
 
@@ -94,11 +89,9 @@ export default function ProductDetailsPage() {
         title: values.title,
         categoryId: values.categoryId,
         price: values.price,
-        promotionalPrice: values.promotionalPrice,
         costPrice: values.costPrice,
         stock: values.stock,
         isVisible,
-        isBestSeller,
       };
 
       if (isNewProduct) {
@@ -155,7 +148,7 @@ export default function ProductDetailsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-10">
+    <div className="space-y-6 w-full max-w-none pb-10">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button variant="outline" size="icon" asChild>
@@ -169,7 +162,7 @@ export default function ProductDetailsPage() {
             </h1>
             <p className="text-sm text-muted-foreground">
               {isNewProduct
-                ? "Cadastre as informações básicas do produto simples."
+                ? "Cadastre as informações básicas do produto."
                 : "Atualize os dados e o estoque do produto."}
             </p>
           </div>
@@ -228,24 +221,13 @@ export default function ProductDetailsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Preço (R$)</Label>
+                <Label htmlFor="price">Preço de Venda (R$)</Label>
                 <Input
                   id="price"
                   type="number"
                   step="0.01"
                   placeholder="0,00"
                   {...form.register("price")}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="promotionalPrice">Preço Promocional (R$)</Label>
-                <Input
-                  id="promotionalPrice"
-                  type="number"
-                  step="0.01"
-                  placeholder="0,00"
-                  {...form.register("promotionalPrice")}
                 />
               </div>
 
@@ -260,7 +242,7 @@ export default function ProductDetailsPage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="stock">Estoque Inicial</Label>
                 <Input
                   id="stock"
@@ -271,16 +253,9 @@ export default function ProductDetailsPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 pt-4 border-t sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center space-x-2">
-                <Switch id="isVisible" checked={isVisible} onCheckedChange={setIsVisible} />
-                <Label htmlFor="isVisible">Visível no catálogo</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch id="isBestSeller" checked={isBestSeller} onCheckedChange={setIsBestSeller} />
-                <Label htmlFor="isBestSeller">Destaque (Mais Vendido)</Label>
-              </div>
+            <div className="flex items-center space-x-2 pt-4 border-t">
+              <Switch id="isVisible" checked={isVisible} onCheckedChange={setIsVisible} />
+              <Label htmlFor="isVisible">Visível no catálogo</Label>
             </div>
           </CardContent>
         </Card>

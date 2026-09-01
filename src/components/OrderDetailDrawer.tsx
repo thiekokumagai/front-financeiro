@@ -438,12 +438,12 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
           productId: item.productId,
           productItemId: item.productItemId || undefined,
           title: item.productName,
-          price: product.promotionalPrice || product.price || item.price,
+          price: product.price || item.price,
           quantity: Math.min(item.quantity, availableStock),
           imageUrl: item.imageUrl,
           variation: item.variation,
           maxStock: availableStock,
-          isPromo: !!product.promotionalPrice,
+          isPromo: false,
           oldPrice: product.price || item.price,
         });
       });

@@ -130,7 +130,7 @@ export default function EditOrderPage() {
         {
           productId: product.id,
           title: product.title,
-          price: product.promotionalPrice || product.price || 0,
+          price: product.price || 0,
           quantity: 1,
         },
       ];
@@ -201,7 +201,7 @@ export default function EditOrderPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-12">
+    <div className="space-y-6 w-full max-w-none pb-12">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button variant="outline" size="icon" onClick={() => navigate(`/pedidos/${id}`)}>

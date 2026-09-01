@@ -64,7 +64,7 @@ export function ProductSearch({ onSelectProduct }: ProductSearchProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-700 text-sm">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.promotionalPrice || product.price || 0)}
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price || 0)}
                     </span>
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-violet-600 hover:bg-violet-50 hover:text-violet-700">
                       <Plus className="h-4 w-4" />

@@ -194,7 +194,7 @@ interface ProductListTableProps {
   onBulkEnable: (ids: string[]) => void;
   onBulkDelete: (ids: string[]) => void;
   isBulkPending: boolean;
-  onUpdateProduct?: (id: string, values: { price?: number; promotionalPrice?: number; costPrice?: number }) => Promise<void>;
+  onUpdateProduct?: (id: string, values: { price?: number; costPrice?: number }) => Promise<void>;
   onUpdateStock?: (productId: string, type: 'ADD' | 'SUBTRACT', quantity: number) => Promise<void>;
   onDuplicateProduct?: (id: string) => Promise<void>;
 }

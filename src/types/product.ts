@@ -23,11 +23,9 @@ export type ProductResponse = {
   categoryId: string;
   category?: Category;
   price?: number;
-  promotionalPrice?: number;
   costPrice?: number;
   stock: number;
   isVisible?: boolean;
-  isBestSeller?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -36,11 +34,9 @@ export type CreateProductPayload = {
   title: string;
   categoryId: string;
   price?: number;
-  promotionalPrice?: number;
   costPrice?: number;
   stock?: number;
   isVisible?: boolean;
-  isBestSeller?: boolean;
 };
 
 export type UpdateProductStockPayload = {

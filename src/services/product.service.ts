@@ -17,11 +17,9 @@ type ProductApiResponse = {
     title: string;
   };
   price?: string | number | null;
-  promotionalPrice?: string | number | null;
   costPrice?: string | number | null;
   stock?: number;
   isVisible?: boolean;
-  isBestSeller?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -33,11 +31,9 @@ function normalizeProduct(item: ProductApiResponse): ProductResponse {
     categoryId: item.categoryId,
     category: item.category,
     price: item.price ? Number(item.price) : undefined,
-    promotionalPrice: item.promotionalPrice ? Number(item.promotionalPrice) : undefined,
     costPrice: item.costPrice ? Number(item.costPrice) : undefined,
     stock: item.stock ?? 0,
     isVisible: item.isVisible ?? true,
-    isBestSeller: item.isBestSeller ?? false,
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
   };
