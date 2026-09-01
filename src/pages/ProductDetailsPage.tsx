@@ -168,14 +168,7 @@ export default function ProductDetailsPage() {
           </div>
         </div>
 
-        <Button
-          onClick={form.handleSubmit((v) => saveMutation.mutate(v))}
-          disabled={saveMutation.isPending}
-          className="gap-2"
-        >
-          <Save className="h-4 w-4" />
-          {saveMutation.isPending ? "Salvando..." : "Salvar Produto"}
-        </Button>
+        
       </div>
 
       <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="space-y-6">
@@ -248,6 +241,17 @@ export default function ProductDetailsPage() {
                 <Switch id="isVisible" checked={isVisible} onCheckedChange={setIsVisible} />
                 <Label htmlFor="isVisible">Visível no catálogo</Label>
               </div>
+            </div>
+            <div className="flex justify-end pt-2">
+            <Button
+              onClick={form.handleSubmit((v) => saveMutation.mutate(v))}
+              disabled={saveMutation.isPending}
+              className="gap-2"
+            >
+                
+              <Save className="h-4 w-4" />
+              {saveMutation.isPending ? "Salvando..." : "Salvar Produto"}
+            </Button>
             </div>
           </CardContent>
         </Card>
@@ -346,17 +350,6 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
             )}
-            <div className="flex justify-end pt-2">
-              <Button
-                type="button"
-                onClick={form.handleSubmit((v) => saveMutation.mutate(v))}
-                disabled={saveMutation.isPending}
-                className="gap-2 w-full sm:w-auto shrink-0"
-              >
-                <Save className="h-4 w-4" />
-                {saveMutation.isPending ? "Salvando..." : "Salvar Produto"}
-              </Button>
-            </div>
           </CardContent>
         </Card>
       )}

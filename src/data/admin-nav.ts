@@ -11,6 +11,7 @@ import {
   Receipt,
   Layers,
   CreditCard,
+  BookOpen,
 } from "lucide-react";
 
 export const superAdminNavItems = [
@@ -53,6 +54,7 @@ export const navSections = [
     items: [
       { title: "Produtos", url: "/produtos", icon: Package },
       { title: "Categorias", url: "/categorias", icon: FolderTree },
+      { title: "Catálogo Digital", url: "/marketing/catalogo", icon: BookOpen },
     ],
   },
   {

@@ -37,6 +37,8 @@ const NotFound = lazy(() => import("@/pages/NotFound"));
 const OrderPrintPage = lazy(() => import("@/pages/OrderPrintPage"));
 const BillingPage = lazy(() => import("@/pages/BillingPage"));
 const SuspendedStorePage = lazy(() => import("@/pages/SuspendedStorePage"));
+const PublicCatalogPage = lazy(() => import("@/pages/PublicCatalogPage"));
+const DigitalCatalogAdminPage = lazy(() => import("@/pages/DigitalCatalogAdminPage"));
 
 function RouteFallback() {
   return (
@@ -64,6 +66,7 @@ const App = () => (
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/catalogo" element={<PublicCatalogPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/suspended" element={<SuspendedStorePage />} />
               
@@ -92,6 +95,7 @@ const App = () => (
                   <Route path="/produtos" element={<ProductsPage />} />
                   <Route path="/produtos/:id" element={<ProductDetailsPage />} />
                   <Route path="/categorias" element={<CategoriesPage />} />
+                  <Route path="/marketing/catalogo" element={<DigitalCatalogAdminPage />} />
                   <Route path="/cupons" element={<CouponsPage />} />
                   <Route path="/configuracoes" element={<SettingsPage />} />
                   <Route path="/minha-assinatura" element={<BillingPage />} />
