@@ -156,12 +156,12 @@ export default function PublicCatalogPage() {
           </div>
 
           <div className="space-y-1">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-amber-400 bg-amber-400/10 px-3.5 py-1 rounded-full border border-amber-400/20">
               <Sparkles className="h-3 w-3 text-amber-400" />
-              Catálogo Oficial 2026
+              {settings?.storeName || "FINANCEIRO"}
             </span>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
-              {settings?.storeName || "Tabela de Produtos"}
+              Catálogo de Produtos
             </h1>
             {settings?.topHeaderText && (
               <p className="text-xs text-zinc-400 font-medium max-w-md">
@@ -248,15 +248,12 @@ export default function PublicCatalogPage() {
                 {/* Capsule List */}
                 <div className="space-y-2.5">
                   {group.items.map((product) => {
-                    const quantityInCart = cart[product.id] || 0;
                     const isOutOfStock = (product.stock !== undefined && product.stock !== null && product.stock <= 0);
 
                     return (
                       <div
                         key={product.id}
-                        className={`group relative flex items-center justify-between gap-3 bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-zinc-950 border border-zinc-800/90 hover:border-amber-400/50 rounded-2xl p-3.5 sm:px-5 transition-all shadow-md ${
-                          quantityInCart > 0 ? "border-amber-400 ring-1 ring-amber-400/30 bg-zinc-900" : ""
-                        }`}
+                        className="group relative flex items-center justify-between gap-3 bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-zinc-950 border border-zinc-800/90 hover:border-amber-400/50 rounded-2xl p-3.5 sm:px-5 transition-all shadow-md"
                       >
                         {/* Product Title & Subtitle */}
                         <div className="min-w-0 flex-1 pr-2">
@@ -270,44 +267,16 @@ export default function PublicCatalogPage() {
                           )}
                         </div>
 
-                        {/* Price Badge and Quantity Counter */}
+                        {/* Price Badge Only (No cart buttons) */}
                         <div className="flex items-center gap-3 shrink-0">
                           {isOutOfStock ? (
                             <span className="text-xs font-bold text-rose-400 bg-rose-950/60 border border-rose-800/60 px-3 py-1.5 rounded-full">
                               Esgotado
                             </span>
                           ) : (
-                            <div className="flex items-center gap-2">
-                              {/* Price Badge */}
-                              <span className="bg-amber-400 text-zinc-950 font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full tracking-tight shadow-md">
-                                {formatCurrency(Number(product.price) || 0)}
-                              </span>
-
-                              {/* Quantity Selector Controls */}
-                              <div className="flex items-center gap-1 bg-black/60 border border-zinc-800 rounded-full p-1">
-                                {quantityInCart > 0 ? (
-                                  <>
-                                    <button
-                                      onClick={() => handleQuantityChange(product.id, -1)}
-                                      className="w-6 h-6 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition"
-                                      title="Diminuir"
-                                    >
-                                      <Minus className="h-3 w-3" />
-                                    </button>
-                                    <span className="w-5 text-center text-xs font-bold text-amber-300">
-                                      {quantityInCart}
-                                    </span>
-                                  </>
-                                ) : null}
-                                <button
-                                  onClick={() => handleQuantityChange(product.id, 1)}
-                                  className="w-6 h-6 rounded-full bg-amber-400 hover:bg-amber-300 text-zinc-950 flex items-center justify-center font-bold transition shadow-sm"
-                                  title="Adicionar"
-                                >
-                                  <Plus className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
-                            </div>
+                            <span className="bg-amber-400 text-zinc-950 font-black text-xs sm:text-sm px-4 py-1.5 rounded-full tracking-tight shadow-md">
+                              {formatCurrency(Number(product.price) || 0)}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -320,24 +289,22 @@ export default function PublicCatalogPage() {
         )}
       </div>
 
-      {/* Floating Bottom CTA Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-t from-black via-slate-950/95 to-transparent backdrop-blur-md">
-        <div className="max-w-md mx-auto">
-          <button
-            onClick={handleShareWhatsApp}
-            className="w-full h-14 bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-base sm:text-lg rounded-2xl shadow-xl shadow-emerald-950/50 border border-emerald-400/40 flex items-center justify-center gap-3 transition-all active:scale-98"
-          >
-            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
-              <MessageCircle className="h-5 w-5 fill-white text-emerald-600" />
-            </div>
-            <span>
-              {totalItemsInCart > 0
-                ? `Fazer Pedido (${totalItemsInCart} itens) • ${formatCurrency(cartTotalValue)}`
-                : "Toque aqui e faça o seu pedido!"}
-            </span>
-          </button>
+      {/* Floating Bottom Contact Bar */}
+      {settings?.phone && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-t from-black via-slate-950/95 to-transparent backdrop-blur-md">
+          <div className="max-w-md mx-auto">
+            <button
+              onClick={handleShareWhatsApp}
+              className="w-full h-13 bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-base rounded-2xl shadow-xl shadow-emerald-950/50 border border-emerald-400/40 flex items-center justify-center gap-3 transition-all active:scale-98"
+            >
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <MessageCircle className="h-4 w-4 fill-white text-emerald-600" />
+              </div>
+              <span>Falar no WhatsApp com a Loja</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

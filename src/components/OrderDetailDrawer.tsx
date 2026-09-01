@@ -519,8 +519,34 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
     if (!order) return;
     const phoneStr = order.customerPhone.replace(/\D/g, '');
     const numero = phoneStr.startsWith('55') ? phoneStr : `55${phoneStr}`;
-    const message = encodeURIComponent(`Olá ${order.customerName}, referente ao seu pedido #${order.orderNumber || ''}`);
-    
+
+    let itemsText = "";
+    if (Array.isArray(order.items) && order.items.length > 0) {
+      itemsText = order.items
+        .map((i: any) => `• *${i.quantity || 1}x* ${i.productName || i.title || "Produto"} - ${formatCurrency((Number(i.price) || 0) * (Number(i.quantity) || 1))}`)
+        .join("\n");
+    }
+
+    let paymentLabel = paymentMethodLabels[order.paymentMethod] || order.paymentMethod || "Outro";
+    if ((order.paymentMethod === 'credit' || order.paymentMethod === 'credito' || order.paymentMethod === 'Cartão de Crédito') && order.installments && Number(order.installments) > 1) {
+      paymentLabel += ` (${order.installments}x)`;
+    }
+
+    let extraCashText = "";
+    if (order.paymentMethod === 'cash' || order.paymentMethod === 'dinheiro' || order.paymentMethod === 'Dinheiro') {
+      if (order.amountProvided && Number(order.amountProvided) > 0) {
+        extraCashText += `\n💵 *Troco para:* ${formatCurrency(Number(order.amountProvided))}`;
+      }
+      if (order.changeAmount && Number(order.changeAmount) > 0) {
+        extraCashText += `\n🪙 *Valor do troco:* ${formatCurrency(Number(order.changeAmount))}`;
+      }
+    }
+
+    const totalStr = formatCurrency(Number(order.totalOrder || order.totalReceived || 0));
+
+    const text = `Olá *${order.customerName}*! 🛒\n\nSegue o comprovante do seu pedido *#${order.orderNumber || ''}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
+
+    const message = encodeURIComponent(text);
     const urlApp = `whatsapp://send?phone=${numero}&text=${message}`;
     const urlWeb = `https://wa.me/${numero}?text=${message}`;
     
@@ -880,12 +906,13 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                     Taxa estimada (Débito): {formatCurrency(estimatedDebitFee)} ({debitFeePercentage.toFixed(2)}%)
                   </div>
                 )}
-                {isPaid && order.installments && (order.paymentMethod === "credit" || order.paymentMethod === "credito" || order.paymentMethod === "Cartão de Crédito") && (
+                {order.installments && Number(order.installments) > 1 && (
                   <div className="flex justify-between text-slate-500 border-t border-slate-100 pt-2">
-                    <span>Parcelas pagas</span>
+                    <span>Parcelas</span>
                     <span className="text-slate-800 font-bold">{order.installments}x</span>
                   </div>
                 )}
+                
                 {isPaid && order.cardFee !== undefined && order.cardFee > 0 && (
                   <div className="flex flex-col gap-1 border-t border-slate-100 pt-2">
                     <div className="flex justify-between text-slate-500">

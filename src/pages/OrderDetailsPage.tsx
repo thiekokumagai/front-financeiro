@@ -289,8 +289,24 @@ export default function OrderDetailsPage() {
                 </div>
                 <div className="flex justify-between text-slate-500 items-center">
                   <span>Forma de pagamento</span>
-                  <span className="font-bold text-slate-800">{paymentLabels[order.paymentMethod] || order.paymentMethod || "-"}</span>
+                  <span className="font-bold text-slate-800">
+                    {paymentLabels[order.paymentMethod] || order.paymentMethod || "-"}
+                    {order.installments && Number(order.installments) > 1 ? ` (${order.installments}x)` : ""}
+                  </span>
                 </div>
+                
+                {order.amountProvided && Number(order.amountProvided) > 0 && (
+                  <div className="flex justify-between text-slate-500 pt-2 border-t border-slate-100">
+                    <span>Troco para</span>
+                    <span className="font-bold text-slate-800">R$ {Number(order.amountProvided).toFixed(2)}</span>
+                  </div>
+                )}
+                {order.changeAmount && Number(order.changeAmount) > 0 && (
+                  <div className="flex justify-between text-slate-500">
+                    <span>Valor do troco</span>
+                    <span className="font-bold text-emerald-600">R$ {Number(order.changeAmount).toFixed(2)}</span>
+                  </div>
+                )}
                 {order.pixKey && (
                   <div className="flex flex-col gap-1 text-slate-500 pt-2 border-t border-slate-100">
                     <span>Chave PIX</span>

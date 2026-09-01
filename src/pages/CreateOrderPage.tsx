@@ -82,15 +82,29 @@ export default function CreateOrderPage() {
         .join("\n");
     }
 
-    const paymentLabel = 
+    let paymentLabel = 
       order.paymentMethod === 'pix' || order.paymentMethod === 'PIX' ? 'PIX' :
       order.paymentMethod === 'credit' || order.paymentMethod === 'Cartão de Crédito' ? 'Cartão de Crédito' :
       order.paymentMethod === 'debit' || order.paymentMethod === 'Cartão de Débito' ? 'Cartão de Débito' :
       order.paymentMethod === 'cash' || order.paymentMethod === 'Dinheiro' ? 'Dinheiro' : order.paymentMethod || 'Outro';
 
+    if ((order.paymentMethod === 'credit' || order.paymentMethod === 'Cartão de Crédito') && order.installments && Number(order.installments) > 1) {
+      paymentLabel += ` (${order.installments}x)`;
+    }
+
+    let extraCashText = "";
+    if (order.paymentMethod === 'cash' || order.paymentMethod === 'Dinheiro') {
+      if (order.amountProvided && Number(order.amountProvided) > 0) {
+        extraCashText += `\n💵 *Troco para:* ${formatCurrency(Number(order.amountProvided))}`;
+      }
+      if (order.changeAmount && Number(order.changeAmount) > 0) {
+        extraCashText += `\n🪙 *Valor do troco:* ${formatCurrency(Number(order.changeAmount))}`;
+      }
+    }
+
     const totalStr = formatCurrency(Number(order.totalOrder || order.totalReceived || 0));
 
-    const text = `Olá *${customerName}*! 🛒\n\nSegue o comprovante do seu pedido *${orderNum}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
+    const text = `Olá *${customerName}*! 🛒\n\nSegue o comprovante do seu pedido *${orderNum}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
 
     const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`;
     window.open(waUrl, "_blank");
@@ -203,6 +217,11 @@ export default function CreateOrderPage() {
         }
       }
 
+      const parsedChangeFor = parseFloat(changeFor.replace(/\./g, '').replace(',', '.'));
+      const isCash = paymentMethod === 'Dinheiro' || paymentMethod === 'cash';
+      const amountProvidedVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > 0 ? parsedChangeFor : (isCash ? finalTotal : undefined);
+      const changeAmountVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > finalTotal ? Math.round((parsedChangeFor - finalTotal) * 100) / 100 : undefined;
+
       const payload = {
         customerName: finalCustomerName,
         customerPhone: finalCustomerPhone,
@@ -213,6 +232,8 @@ export default function CreateOrderPage() {
         paymentMethod: paymentMethod === 'PIX' ? 'pix' : paymentMethod === 'Cartão de Crédito' ? 'credit' : paymentMethod === 'Cartão de Débito' ? 'debit' : paymentMethod === 'Dinheiro' ? 'cash' : paymentMethod,
         paymentStatus: isPaid ? "PAID" : "PENDING",
         installments: effectiveCreditInstallments,
+        amountProvided: amountProvidedVal,
+        changeAmount: changeAmountVal,
         observation: orderNote || undefined,
         items: orderItems.map((item) => ({
           productId: item.productId,
@@ -233,6 +254,9 @@ export default function CreateOrderPage() {
         customerName: finalCustomerName,
         customerPhone: finalCustomerPhone,
         paymentMethod,
+        installments: effectiveCreditInstallments,
+        amountProvided: amountProvidedVal,
+        changeAmount: changeAmountVal,
         totalOrder: finalTotal,
       });
     } catch (error: any) {
@@ -427,6 +451,25 @@ export default function CreateOrderPage() {
                   <span className="text-slate-500 font-medium">WhatsApp do Cliente:</span>
                   <span className="font-mono font-bold text-slate-800">{formatPhone(createdOrderModalData.customerPhone || "")}</span>
                 </div>
+                <div className="flex justify-between border-t pt-2">
+                  <span className="text-slate-500 font-medium">Forma de Pagamento:</span>
+                  <span className="font-bold text-slate-800">
+                    {createdOrderModalData.paymentMethod}
+                    {createdOrderModalData.installments && Number(createdOrderModalData.installments) > 1 ? ` (${createdOrderModalData.installments}x)` : ""}
+                  </span>
+                </div>
+                {Number(createdOrderModalData.amountProvided || 0) > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 font-medium">Troco para:</span>
+                    <span className="font-bold text-slate-800">{formatCurrency(Number(createdOrderModalData.amountProvided))}</span>
+                  </div>
+                )}
+                {Number(createdOrderModalData.changeAmount || 0) > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 font-medium">Valor do troco:</span>
+                    <span className="font-bold text-emerald-600">{formatCurrency(Number(createdOrderModalData.changeAmount))}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t pt-2 mt-2">
                   <span className="text-slate-500 font-medium">Total do Pedido:</span>
                   <span className="font-black text-slate-900">{formatCurrency(createdOrderModalData.totalOrder || 0)}</span>

@@ -27,10 +27,8 @@ export default function DigitalCatalogAdminPage() {
   };
 
   const handleOpenWhatsApp = () => {
-    const rawPhone = settings?.phone?.replace(/\D/g, "") || "";
-    const targetPhone = rawPhone.startsWith("55") ? rawPhone : `55${rawPhone}`;
     const message = encodeURIComponent(`Olá! Confira nosso catálogo interativo de produtos:\n${catalogUrl}`);
-    const waUrl = targetPhone ? `https://wa.me/${targetPhone}?text=${message}` : `https://wa.me/?text=${message}`;
+    const waUrl = `https://api.whatsapp.com/send?text=${message}`;
     window.open(waUrl, "_blank");
   };
 
@@ -59,11 +57,11 @@ export default function DigitalCatalogAdminPage() {
           </Button>
 
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => window.open(catalogUrl, "_blank")}
-            className="border-zinc-700 text-zinc-200 hover:bg-zinc-800 gap-2 rounded-xl"
+            className="bg-white text-zinc-950 hover:bg-slate-200 font-bold gap-2 rounded-xl border border-zinc-200 shadow-sm"
           >
-            <ExternalLink className="h-4 w-4" />
+            <ExternalLink className="h-4 w-4 text-zinc-950" />
             <span>Abrir Catálogo</span>
           </Button>
         </div>

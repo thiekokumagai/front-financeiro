@@ -147,6 +147,11 @@ export default function EditOrderPage() {
 
     setIsSubmitting(true);
     try {
+      const parsedChangeFor = parseFloat(changeFor.replace(/\./g, '').replace(',', '.'));
+      const isCash = paymentMethod === 'Dinheiro' || paymentMethod === 'cash';
+      const amountProvidedVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > 0 ? parsedChangeFor : (isCash ? finalTotal : undefined);
+      const changeAmountVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > finalTotal ? Math.round((parsedChangeFor - finalTotal) * 100) / 100 : undefined;
+
       const payload = {
         customerName: selectedCustomer.name,
         customerPhone: selectedCustomer.phone,
@@ -157,6 +162,8 @@ export default function EditOrderPage() {
         paymentMethod: paymentMethod === 'PIX' ? 'pix' : paymentMethod === 'Cartão de Crédito' ? 'credit' : paymentMethod === 'Cartão de Débito' ? 'debit' : paymentMethod === 'Dinheiro' ? 'cash' : paymentMethod,
         paymentStatus: isPaid ? "PAID" : "PENDING",
         installments: effectiveCreditInstallments,
+        amountProvided: amountProvidedVal,
+        changeAmount: changeAmountVal,
         observation: orderNote || undefined,
         items: orderItems.map((item) => ({
           productId: item.productId,
