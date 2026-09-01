@@ -17,6 +17,8 @@ import { customersService } from "@/services/customers.service";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { formatCurrency, formatPhone } from "@/utils/formatters";
 
+import { openWhatsApp } from "@/utils/whatsapp";
+
 interface OrderItem {
   productId: string;
   title: string;
@@ -106,8 +108,10 @@ export default function CreateOrderPage() {
 
     const text = `Olá *${customerName}*! 🛒\n\nSegue o comprovante do seu pedido *${orderNum}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
 
-    const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`;
-    window.open(waUrl, "_blank");
+    openWhatsApp({
+      phone,
+      text,
+    });
   };
 
   const pixDiscountPercent = useMemo(() => {

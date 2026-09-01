@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Copy, ExternalLink, Share2, Smartphone, Sparkles, Check, MessageCircle, Layers, Package } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
+import { openWhatsApp } from "@/utils/whatsapp";
 
 export default function DigitalCatalogAdminPage() {
   const { toast } = useToast();
@@ -27,9 +28,11 @@ export default function DigitalCatalogAdminPage() {
   };
 
   const handleOpenWhatsApp = () => {
-    const message = encodeURIComponent(`Olá! Confira nosso catálogo interativo de produtos:\n${catalogUrl}`);
-    const waUrl = `https://api.whatsapp.com/send?text=${message}`;
-    window.open(waUrl, "_blank");
+    const message = `Olá! Confira nosso catálogo interativo de produtos:\n${catalogUrl}`;
+    openWhatsApp({
+      phone: settings?.phone,
+      text: message,
+    });
   };
 
   return (

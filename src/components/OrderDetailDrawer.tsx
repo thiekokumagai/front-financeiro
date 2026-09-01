@@ -23,6 +23,7 @@ import { OrderStatus } from "@/types/order";
 import { customersService } from "@/services/customers.service";
 import { getProductById } from "@/services/product.service";
 import { formatPhone } from "@/utils/formatters";
+import { openWhatsApp } from "@/utils/whatsapp";
 
 interface OrderDetailDrawerProps {
   orderId: string | null;
@@ -546,22 +547,10 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
 
     const text = `Olá *${order.customerName}*! 🛒\n\nSegue o comprovante do seu pedido *#${order.orderNumber || ''}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
 
-    const message = encodeURIComponent(text);
-    const urlApp = `whatsapp://send?phone=${numero}&text=${message}`;
-    const urlWeb = `https://wa.me/${numero}?text=${message}`;
-    
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      window.location.href = urlApp;
-      setTimeout(() => {
-        if (document.visibilityState === "visible") {
-          window.open(urlWeb, "_blank", "noopener,noreferrer");
-        }
-      }, 1500);
-    } else {
-      window.open(urlWeb, "_blank", "noopener,noreferrer");
-    }
+    openWhatsApp({
+      phone: numero,
+      text,
+    });
   };
 
   const formatCurrency = (value: number) => {

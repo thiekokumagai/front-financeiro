@@ -3,6 +3,7 @@ import { getPublicStoreSettings, getPublicStoreCategories, getPublicStoreProduct
 import { Product } from "@/types/product";
 import { Category } from "@/types/category";
 import { buildImageUrl } from "@/utils/image-url";
+import { openWhatsApp } from "@/utils/whatsapp";
 import { ShoppingCart, MessageCircle, Plus, Minus, Search, Sparkles, Check, Share2, Copy } from "lucide-react";
 import { formatCurrency } from "@/utils/formatters";
 
@@ -36,6 +37,12 @@ export default function PublicCatalogPage() {
     }
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (settings?.storeName) {
+      document.title = `${settings.storeName} | Catálogo de Produtos`;
+    }
+  }, [settings]);
 
   const handleQuantityChange = (productId: string, delta: number) => {
     setCart((prev) => {
@@ -93,9 +100,6 @@ export default function PublicCatalogPage() {
   }, [cart, products]);
 
   const handleShareWhatsApp = () => {
-    const rawPhone = settings?.phone?.replace(/\D/g, "") || "";
-    const targetPhone = rawPhone.startsWith("55") ? rawPhone : `55${rawPhone}`;
-
     let message = `Olá! Gostaria de fazer o pedido dos seguintes produtos:\n\n`;
 
     if (totalItemsInCart > 0) {
@@ -108,15 +112,13 @@ export default function PublicCatalogPage() {
       });
       message += `\n*TOTAL: ${formatCurrency(cartTotalValue)}*`;
     } else {
-      message = `Olá! Gostaria de consultar o catálogo de produtos e fazer um pedido.`;
+      message = `Olá! Gostaria de consultar os produtos de ${settings?.storeName || "sua loja"} e fazer um pedido.`;
     }
 
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = targetPhone && targetPhone.length >= 10
-      ? `https://wa.me/${targetPhone}?text=${encodedMessage}`
-      : `https://wa.me/?text=${encodedMessage}`;
-
-    window.open(whatsappUrl, "_blank");
+    openWhatsApp({
+      phone: settings?.phone,
+      text: message,
+    });
   };
 
   const handleCopyLink = () => {
@@ -129,7 +131,9 @@ export default function PublicCatalogPage() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-amber-400 gap-3">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-400 border-t-transparent" />
-        <span className="text-sm font-semibold tracking-wider animate-pulse">Carregando catálogo...</span>
+        <span className="text-sm font-semibold tracking-wider animate-pulse">
+          Carregando {settings?.storeName || "catálogo"}...
+        </span>
       </div>
     );
   }
@@ -158,7 +162,7 @@ export default function PublicCatalogPage() {
           <div className="space-y-1">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-amber-400 bg-amber-400/10 px-3.5 py-1 rounded-full border border-amber-400/20">
               <Sparkles className="h-3 w-3 text-amber-400" />
-              Catálogo de Produtos
+              {settings?.storeName ? `Catálogo - ${settings.storeName}` : "Catálogo de Produtos"}
             </span>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
               {settings?.storeName || "FINANCEIRO"}
@@ -177,7 +181,7 @@ export default function PublicCatalogPage() {
               className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-amber-400 bg-zinc-900/80 hover:bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full transition-colors"
             >
               {copiedLink ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-              <span>{copiedLink ? "Link Copiado!" : "Copiar Link do Catálogo"}</span>
+              <span>{copiedLink ? "Link Copiado!" : settings?.storeName ? `Copiar Link de ${settings.storeName}` : "Copiar Link do Catálogo"}</span>
             </button>
           </div>
         </header>
@@ -300,7 +304,7 @@ export default function PublicCatalogPage() {
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 fill-white text-emerald-600" />
               </div>
-              <span>Falar no WhatsApp com a Loja</span>
+              <span>{settings?.storeName ? `Falar no WhatsApp com ${settings.storeName}` : "Falar no WhatsApp com a Loja"}</span>
             </button>
           </div>
         </div>

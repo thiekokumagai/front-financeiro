@@ -12,6 +12,7 @@ import { customersService } from "@/services/customers.service";
 import { getProductById } from "@/services/product.service";
 import { OrderStatus } from "@/types/order";
 import { formatPhone } from "@/utils/formatters";
+import { openWhatsApp } from "@/utils/whatsapp";
 
 const statusConfig: Record<OrderStatus, { label: string; bg: string; text: string }> = {
   PENDING: { label: "Pendente", bg: "bg-amber-100", text: "text-amber-700" },
@@ -197,15 +198,16 @@ export default function OrderDetailsPage() {
             {isRepeating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Repeat className="h-4 w-4" />}
           </button>
 
-          <a 
-            href={`https://wa.me/55${order.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${order.customerName}! Referente ao seu pedido #${order.orderNumber}.`)}`}
-            target="_blank"
-            rel="noreferrer"
+          <button 
+            onClick={() => openWhatsApp({
+              phone: order.customerPhone,
+              text: `Olá ${order.customerName}! Referente ao seu pedido #${order.orderNumber}.`
+            })}
             className="w-9 h-9 rounded-full bg-emerald-50 hover:bg-emerald-100 flex items-center justify-center text-emerald-600 hover:text-emerald-700 transition-colors shrink-0" 
             title="WhatsApp"
           >
             <img src="/whatsapp.svg" alt="WhatsApp" className="h-5 w-5" />
-          </a>
+          </button>
         </div>
       </div>
 
