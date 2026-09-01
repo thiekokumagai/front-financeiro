@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Save } from "lucide-react";
@@ -213,27 +213,61 @@ export default function ProductDetailsPage() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="price">Preço de Venda (R$)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  placeholder="0,00"
-                  {...form.register("price")}
-                />
-              </div>
+              <Controller
+                name="price"
+                control={form.control}
+                render={({ field }) => (
+                  <div className="space-y-2">
+                    <Label htmlFor="price">Preço de Venda (R$)</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
+                      <Input
+                        id="price"
+                        type="text"
+                        placeholder="0,00"
+                        value={
+                          field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
+                            ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value))
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, "");
+                          field.onChange(digits ? Number(digits) / 100 : undefined);
+                        }}
+                        className="pl-9"
+                      />
+                    </div>
+                  </div>
+                )}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="costPrice">Preço de Custo (R$)</Label>
-                <Input
-                  id="costPrice"
-                  type="number"
-                  step="0.01"
-                  placeholder="0,00"
-                  {...form.register("costPrice")}
-                />
-              </div>
+              <Controller
+                name="costPrice"
+                control={form.control}
+                render={({ field }) => (
+                  <div className="space-y-2">
+                    <Label htmlFor="costPrice">Preço de Custo (R$)</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
+                      <Input
+                        id="costPrice"
+                        type="text"
+                        placeholder="0,00"
+                        value={
+                          field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
+                            ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value))
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, "");
+                          field.onChange(digits ? Number(digits) / 100 : undefined);
+                        }}
+                        className="pl-9"
+                      />
+                    </div>
+                  </div>
+                )}
+              />
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t">

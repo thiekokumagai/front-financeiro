@@ -84,10 +84,10 @@ export function ProductDetailsForm({
                         <Input
                           className="h-12 rounded-2xl bg-background pl-9"
                           placeholder="0,00"
-                          value={field.value !== undefined ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(field.value) : ""}
+                          value={field.value !== undefined && field.value !== null && !isNaN(Number(field.value)) ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value)) : ""}
                           onChange={(e) => {
                             const digits = e.target.value.replace(/\D/g, "");
-                            field.onChange(Number(digits) / 100);
+                            field.onChange(digits ? Number(digits) / 100 : undefined);
                           }}
                         />
                       </div>
@@ -109,10 +109,10 @@ export function ProductDetailsForm({
                         <Input
                           className="h-12 rounded-2xl bg-background pl-9"
                           placeholder="0,00"
-                          value={field.value !== undefined ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(field.value) : ""}
+                          value={field.value !== undefined && field.value !== null && !isNaN(Number(field.value)) ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value)) : ""}
                           onChange={(e) => {
                             const digits = e.target.value.replace(/\D/g, "");
-                            field.onChange(Number(digits) / 100);
+                            field.onChange(digits ? Number(digits) / 100 : undefined);
                           }}
                         />
                       </div>
