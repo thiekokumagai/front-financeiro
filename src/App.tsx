@@ -1,0 +1,117 @@
+import { lazy, Suspense } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { DynamicFavicon } from "@/components/DynamicFavicon";
+
+const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const SuperAdminDashboardPage = lazy(() => import("@/pages/SuperAdminDashboardPage"));
+const OrdersPage = lazy(() => import("@/pages/OrdersPage"));
+const CreateOrderPage = lazy(() => import("@/pages/CreateOrderPage"));
+const EditOrderPage = lazy(() => import("@/pages/EditOrderPage"));
+const OrderDetailsPage = lazy(() => import("@/pages/OrderDetailsPage"));
+const ProductsPage = lazy(() => import("@/pages/ProductsPage"));
+const CustomersPage = lazy(() => import("@/pages/CustomersPage"));
+const CustomerDetailsPage = lazy(() => import("@/pages/CustomerDetailsPage"));
+const ProductDetailsPage = lazy(() => import("@/pages/ProductDetailsPage"));
+const CategoriesPage = lazy(() => import("@/pages/CategoriesPage"));
+const CouponsPage = lazy(() => import("@/pages/CouponsPage"));
+const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
+const LinksManagerPage = lazy(() => import("@/pages/LinksManagerPage"));
+const CashRegistersPage = lazy(() => import("@/pages/CashRegistersPage"));
+const CashRegisterDetailsPage = lazy(() => import("@/pages/CashRegisterDetailsPage"));
+const CurrentCashRegisterPage = lazy(() => import("@/pages/CurrentCashRegisterPage"));
+const CustosFixosPage = lazy(() => import("@/pages/CustosFixosPage"));
+const InvestmentsPage = lazy(() => import("@/pages/InvestmentsPage"));
+const PurchaseAnalysisPage = lazy(() => import("@/pages/PurchaseAnalysisPage"));
+const LoginPage = lazy(() => import("@/pages/LoginPage"));
+const SuperAdminStoresPage = lazy(() => import("@/pages/SuperAdminStoresPage"));
+const SuperAdminBillingPage = lazy(() => import("@/pages/SuperAdminBillingPage"));
+const SuperAdminTransactionsPage = lazy(() => import("@/pages/SuperAdminTransactionsPage"));
+const SuperAdminPlansPage = lazy(() => import("@/pages/SuperAdminPlansPage"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const OrderPrintPage = lazy(() => import("@/pages/OrderPrintPage"));
+const BillingPage = lazy(() => import("@/pages/BillingPage"));
+const SuspendedStorePage = lazy(() => import("@/pages/SuspendedStorePage"));
+
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center" aria-busy="true" aria-label="Carregando">
+      <div className="h-9 w-9 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    </div>
+  );
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+    },
+  },
+});
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <DynamicFavicon />
+    <TooltipProvider>
+      <Toaster />
+      <SonnerToaster />
+      <BrowserRouter>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/suspended" element={<SuspendedStorePage />} />
+              
+              {/* Rotas exclusivas do Super Admin */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+                <Route element={<AdminLayout />}>
+                  <Route path="/super-admin/dashboard" element={<SuperAdminDashboardPage />} />
+                  <Route path="/super-admin/lojas" element={<SuperAdminStoresPage />} />
+                  <Route path="/super-admin/assinaturas" element={<SuperAdminBillingPage />} />
+                  <Route path="/super-admin/transacoes" element={<SuperAdminTransactionsPage />} />
+                  <Route path="/super-admin/planos" element={<SuperAdminPlansPage />} />
+                </Route>
+              </Route>
+
+              {/* Rotas exclusivas do Admin da Loja */}
+              <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+                <Route path="/pedidos/:id/imprimir" element={<OrderPrintPage />} />
+                <Route element={<AdminLayout />}>
+                  <Route path="/" element={<DashboardPage />} />
+                  <Route path="/pedidos" element={<OrdersPage />} />
+                  <Route path="/pedidos/novo" element={<CreateOrderPage />} />
+                  <Route path="/pedidos/:id/editar" element={<EditOrderPage />} />
+                  <Route path="/pedidos/:id" element={<OrderDetailsPage />} />
+                  <Route path="/clientes" element={<CustomersPage />} />
+                  <Route path="/clientes/:id" element={<CustomerDetailsPage />} />
+                  <Route path="/produtos" element={<ProductsPage />} />
+                  <Route path="/produtos/:id" element={<ProductDetailsPage />} />
+                  <Route path="/categorias" element={<CategoriesPage />} />
+                  <Route path="/cupons" element={<CouponsPage />} />
+                  <Route path="/configuracoes" element={<SettingsPage />} />
+                  <Route path="/minha-assinatura" element={<BillingPage />} />
+                  <Route path="/marketing/links" element={<LinksManagerPage />} />
+                  <Route path="/caixa" element={<CashRegistersPage />} />
+                  <Route path="/caixa/:id" element={<CashRegisterDetailsPage />} />
+                  <Route path="/financeiro/atual" element={<CurrentCashRegisterPage />} />
+                  <Route path="/financeiro/custos-fixos" element={<CustosFixosPage />} />
+                  <Route path="/investimentos" element={<InvestmentsPage />} />
+                  <Route path="/investimentos/simulacao" element={<PurchaseAnalysisPage />} />
+                </Route>
+              </Route>
+
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
