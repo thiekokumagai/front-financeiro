@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, MessageCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductSearch } from "@/components/orders/ProductSearch";
 import { CustomerSearch } from "@/components/orders/CustomerSearch";
@@ -14,6 +14,8 @@ import { useSettings } from "@/hooks/useSettings";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { customersService } from "@/services/customers.service";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { formatCurrency, formatPhone } from "@/utils/formatters";
 
 interface OrderItem {
   productId: string;
@@ -40,9 +42,59 @@ export default function CreateOrderPage() {
   const [needsChange, setNeedsChange] = useState(false);
   const [changeFor, setChangeFor] = useState("");
   const [orderNote, setOrderNote] = useState("");
+  const [createdOrderModalData, setCreatedOrderModalData] = useState<any | null>(null);
   
   const { data: storeSettings } = useSettings();
   const [creditInstallments, setCreditInstallments] = useState(1);
+
+  const handleResetForm = () => {
+    setOrderItems([]);
+    setSelectedCustomer(null);
+    setPaymentMethod("");
+    setIsPaid(false);
+    setCustomTotal("");
+    setNeedsChange(false);
+    setChangeFor("");
+    setOrderNote("");
+    setCreatedOrderModalData(null);
+  };
+
+  const handleSendWhatsAppToCustomer = (order: any) => {
+    const phone = order.customerPhone || "";
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (!cleanPhone) {
+      toast({
+        variant: "destructive",
+        title: "Telefone não encontrado",
+        description: "O cliente não possui um número de WhatsApp cadastrado.",
+      });
+      return;
+    }
+
+    const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
+    const customerName = order.customerName || "Cliente";
+    const orderNum = order.orderNumber ? `#${order.orderNumber}` : "";
+
+    let itemsText = "";
+    if (Array.isArray(order.items) && order.items.length > 0) {
+      itemsText = order.items
+        .map((i: any) => `• *${i.quantity || 1}x* ${i.productName || i.title || "Produto"} - ${formatCurrency((Number(i.price) || 0) * (Number(i.quantity) || 1))}`)
+        .join("\n");
+    }
+
+    const paymentLabel = 
+      order.paymentMethod === 'pix' || order.paymentMethod === 'PIX' ? 'PIX' :
+      order.paymentMethod === 'credit' || order.paymentMethod === 'Cartão de Crédito' ? 'Cartão de Crédito' :
+      order.paymentMethod === 'debit' || order.paymentMethod === 'Cartão de Débito' ? 'Cartão de Débito' :
+      order.paymentMethod === 'cash' || order.paymentMethod === 'Dinheiro' ? 'Dinheiro' : order.paymentMethod || 'Outro';
+
+    const totalStr = formatCurrency(Number(order.totalOrder || order.totalReceived || 0));
+
+    const text = `Olá *${customerName}*! 🛒\n\nSegue o comprovante do seu pedido *${orderNum}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
+
+    const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, "_blank");
+  };
 
   const pixDiscountPercent = useMemo(() => {
     const rule = storeSettings?.paymentRules?.find((r: any) => r.paymentMethod === 'pix' && r.type === 'discount');
@@ -175,7 +227,14 @@ export default function CreateOrderPage() {
         title: "Pedido criado com sucesso!",
         description: `Pedido #${newOrder.orderNumber} gerado.`,
       });
-      navigate(`/pedidos/${newOrder.id}`);
+      setCreatedOrderModalData({
+        ...newOrder,
+        items: orderItems,
+        customerName: finalCustomerName,
+        customerPhone: finalCustomerPhone,
+        paymentMethod,
+        totalOrder: finalTotal,
+      });
     } catch (error: any) {
       toast({
         title: "Erro ao criar pedido",
@@ -332,6 +391,81 @@ export default function CreateOrderPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Sucesso e Envio do Pedido no WhatsApp do Cliente */}
+      <Dialog
+        open={!!createdOrderModalData}
+        onOpenChange={(open) => {
+          if (!open && createdOrderModalData) {
+            const orderId = createdOrderModalData.id;
+            setCreatedOrderModalData(null);
+            navigate(`/pedidos/${orderId}`);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md rounded-2xl p-6">
+          <DialogHeader className="flex flex-col items-center text-center space-y-2">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-1">
+              <CheckCircle className="h-8 w-8 text-emerald-600" />
+            </div>
+            <DialogTitle className="text-xl font-bold">
+              Pedido #{createdOrderModalData?.orderNumber} Criado!
+            </DialogTitle>
+            <DialogDescription className="text-sm text-slate-500">
+              O pedido foi registrado no sistema. Clique abaixo para enviar o comprovante diretamente no WhatsApp do cliente.
+            </DialogDescription>
+          </DialogHeader>
+
+          {createdOrderModalData && (
+            <div className="space-y-4 pt-2">
+              <div className="bg-slate-50 rounded-xl p-4 border space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-medium">Cliente:</span>
+                  <span className="font-bold text-slate-800">{createdOrderModalData.customerName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-medium">WhatsApp do Cliente:</span>
+                  <span className="font-mono font-bold text-slate-800">{formatPhone(createdOrderModalData.customerPhone || "")}</span>
+                </div>
+                <div className="flex justify-between border-t pt-2 mt-2">
+                  <span className="text-slate-500 font-medium">Total do Pedido:</span>
+                  <span className="font-black text-slate-900">{formatCurrency(createdOrderModalData.totalOrder || 0)}</span>
+                </div>
+              </div>
+
+              {/* Botão verde em destaque que envia para o WhatsApp do cliente */}
+              <Button
+                onClick={() => handleSendWhatsAppToCustomer(createdOrderModalData)}
+                className="w-full h-13 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl gap-2 shadow-lg shadow-emerald-600/25 text-base transition-all"
+              >
+                <MessageCircle className="h-5 w-5 fill-white" />
+                <span>Enviar Comprovante no WhatsApp</span>
+              </Button>
+
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t">
+                <Button
+                  variant="outline"
+                  className="rounded-xl font-semibold"
+                  onClick={() => {
+                    const orderId = createdOrderModalData.id;
+                    setCreatedOrderModalData(null);
+                    navigate(`/pedidos/${orderId}`);
+                  }}
+                >
+                  Ver Pedido
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="rounded-xl font-semibold"
+                  onClick={handleResetForm}
+                >
+                  Novo Pedido
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
