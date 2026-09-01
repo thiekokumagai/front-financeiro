@@ -32,13 +32,11 @@ export default function CreateOrderPage() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>(duplicateData?.items || []);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(duplicateData?.customer || null);
   
-  const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [paymentMethod, setPaymentMethod] = useState(duplicateData?.paymentMethod || "");
   const [isPaid, setIsPaid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBudgetMode, setIsBudgetMode] = useState(false);
   const [customTotal, setCustomTotal] = useState("");
-  const [showProductPrices, setShowProductPrices] = useState(true);
   const [needsChange, setNeedsChange] = useState(false);
   const [changeFor, setChangeFor] = useState("");
   const [orderNote, setOrderNote] = useState("");
@@ -71,15 +69,7 @@ export default function CreateOrderPage() {
 
   const subtotal = orderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  const discount = coupon ? (
-    coupon.type === "VALUE"
-      ? Math.min(coupon.value || 0, subtotal)
-      : coupon.type === "PERCENTAGE"
-        ? subtotal * ((coupon.value || 0) / 100)
-        : 0
-  ) : 0;
-  
-  const totalAfterCoupon = Math.max(0, subtotal - discount);
+  const totalAfterCoupon = subtotal;
   const pixDiscountAmount = paymentMethod === "PIX" ? totalAfterCoupon * (pixDiscountPercent / 100) : 0;
   const discountedProductsTotal = totalAfterCoupon - pixDiscountAmount;
 
@@ -167,10 +157,10 @@ export default function CreateOrderPage() {
         itemsTotal: subtotal,
         totalOrder: finalTotal,
         totalReceived: isPaid ? finalTotal : 0,
-        paymentType: isPaid ? "PAGO" : "PENDENTE",
-        paymentMethod,
+        paymentType: paymentMethod === 'PIX' ? 'online' : 'entrega',
+        paymentMethod: paymentMethod === 'PIX' ? 'pix' : paymentMethod === 'Cartão de Crédito' ? 'credit' : paymentMethod === 'Cartão de Débito' ? 'debit' : paymentMethod === 'Dinheiro' ? 'cash' : paymentMethod,
+        paymentStatus: isPaid ? "PAID" : "PENDING",
         installments: effectiveCreditInstallments,
-        couponId: coupon?.id,
         observation: orderNote || undefined,
         items: orderItems.map((item) => ({
           productId: item.productId,
@@ -318,10 +308,7 @@ export default function CreateOrderPage() {
           <div className="bg-card rounded-xl border p-5 shadow-sm sticky top-6">
             <OrderSummary
               subtotal={subtotal}
-              discount={discount}
               total={finalTotal}
-              coupon={coupon}
-              onApplyCoupon={setCoupon}
               paymentMethod={paymentMethod}
               onPaymentMethodChange={setPaymentMethod}
               creditInstallments={creditInstallments}
@@ -337,8 +324,6 @@ export default function CreateOrderPage() {
               isBudgetMode={isBudgetMode}
               customTotal={customTotal}
               onCustomTotalChange={setCustomTotal}
-              showProductPrices={showProductPrices}
-              onShowProductPricesChange={setShowProductPrices}
               needsChange={needsChange}
               onNeedsChangeChange={setNeedsChange}
               changeFor={changeFor}

@@ -94,7 +94,7 @@ export function AdminSidebar() {
               </div>
               {!collapsed && (
                 <span className="text-sidebar-foreground font-bold text-base tracking-tight">
-                  {superAdmin ? "Super Admin" : "Loja Pod"}
+                  {superAdmin ? "Super Admin" : "Financeiro"}
                 </span>
               )}
             </div>

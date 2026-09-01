@@ -1,7 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { PushNotificationManager } from "@/components/PushNotificationManager";
-import { LogOut, Menu, Printer, Bell, Store, ExternalLink, AlertTriangle } from "lucide-react";
+import { LogOut, Menu, Bell, Store, ExternalLink, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { clearSession } from "@/services/auth.service";
@@ -29,7 +29,7 @@ export function AdminLayout() {
 
   useEffect(() => {
     if (superAdmin) {
-      document.title = "Super Admin | Loja Pod";
+      document.title = "Super Admin | Financeiro";
       return;
     }
 
@@ -120,14 +120,7 @@ export function AdminLayout() {
                       <ExternalLink className="h-3 w-3 opacity-75" />
                     </a>
                   )}
-                  <a
-                    href="https://drive.google.com/file/d/1DB7OmKxWHq559FePfdJHOsLo3yk2LOZY/view?usp=sharing"
-                    target="_blank"
-                    className="hidden text-sm font-medium text-blue-500 hover:text-blue-600 sm:flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-md transition-colors"
-                    title="Baixar Agente de Impressão"
-                  >
-                    <Printer className="h-4 w-4" />
-                  </a>
+
                   <Button variant="outline" size="icon" onClick={handleTestPush} title="Testar notificação" className="h-8 w-8 shrink-0">
                     <Bell className="h-4 w-4" />
                   </Button>

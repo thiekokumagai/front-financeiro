@@ -142,9 +142,7 @@ function InlinePriceInput({ value, onSave }: InlinePriceInputProps) {
       }}
       className="cursor-pointer font-semibold text-sm hover:bg-muted/80 rounded px-1.5 py-0.5 border border-transparent hover:border-border transition-colors inline-block text-left"
     >
-      {value !== undefined && value > 0
-        ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
-        : <span className="text-muted-foreground text-xs font-normal">R$ 0,00</span>}
+      {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value ?? 0)}
     </div>
   );
 }

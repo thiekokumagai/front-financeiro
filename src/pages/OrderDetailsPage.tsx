@@ -1,13 +1,13 @@
-import { useParams, useNavigate } from "react";
-import { useOrderDetails, useCancelOrder, useReprintOrder } from "@/hooks/useOrders";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useOrderDetails, useCancelOrder } from "@/hooks/useOrders";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { 
-  ArrowLeft, Send, Printer, Edit,
+  ArrowLeft, Send, Edit,
   User, Phone, Loader2, Repeat 
 } from "lucide-react";
-import { useState } from "react";
 import { customersService } from "@/services/customers.service";
 import { getProductById } from "@/services/product.service";
 import { OrderStatus } from "@/types/order";
@@ -49,24 +49,6 @@ export default function OrderDetailsPage() {
   
   const { data: order, isLoading } = useOrderDetails(id ?? "");
   const cancelMutation = useCancelOrder();
-  const reprintMutation = useReprintOrder();
-
-  const handleReprintOrder = async () => {
-    if (!id) return;
-    try {
-      await reprintMutation.mutateAsync(id);
-      toast({
-        title: "Reimpressão enviada",
-        description: `O pedido #${order?.orderNumber} foi enviado para a impressora.`,
-      });
-    } catch (err: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao imprimir",
-        description: err.message || "Ocorreu um erro ao processar a reimpressão.",
-      });
-    }
-  };
 
   const handleCancelOrder = async () => {
     if (!id) return;
@@ -194,16 +176,7 @@ export default function OrderDetailsPage() {
 
         {/* Quick actions */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-          {order.status !== 'CANCELLED' && (
-            <button 
-              onClick={handleReprintOrder}
-              disabled={reprintMutation.isPending}
-              className="w-9 h-9 rounded-full bg-violet-50 hover:bg-violet-100 flex items-center justify-center text-violet-600 hover:text-violet-700 transition-colors shrink-0 disabled:opacity-50" 
-              title="Imprimir"
-            >
-              {reprintMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
-            </button>
-          )}
+
 
           {order.status === 'PENDING' && order.paymentStatus === 'PENDING' && (
             <button 
@@ -247,9 +220,14 @@ export default function OrderDetailsPage() {
                   {formattedDate(order.createdAt)}
                 </span>
               </div>
-              <Badge className={`${statusConfig[order.status].bg} ${statusConfig[order.status].text} hover:${statusConfig[order.status].bg} border-0 px-3 py-1 font-semibold rounded-full text-sm`}>
-                {statusConfig[order.status].label}
-              </Badge>
+              {(() => {
+                const statusInfo = statusConfig[order.status] || { label: order.status || "Pendente", bg: "bg-slate-100", text: "text-slate-700" };
+                return (
+                  <Badge className={`${statusInfo.bg} ${statusInfo.text} hover:${statusInfo.bg} border-0 px-3 py-1 font-semibold rounded-full text-sm`}>
+                    {statusInfo.label}
+                  </Badge>
+                );
+              })()}
             </div>
           </div>
 
@@ -259,7 +237,7 @@ export default function OrderDetailsPage() {
               Itens do Pedido
             </h3>
             <div className="space-y-3 bg-white rounded-xl border border-slate-200/60 p-6 shadow-sm">
-              {order.items.map((item) => (
+              {(order.items || []).map((item) => (
                 <div key={item.id} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
                   <div className="flex items-center gap-3">
                     <span className="min-w-[24px] h-[24px] rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
@@ -270,7 +248,7 @@ export default function OrderDetailsPage() {
                     </span>
                   </div>
                   <span className="text-sm font-bold text-slate-700">
-                    R$ {(item.price * item.quantity).toFixed(2)}
+                    R$ {(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -287,13 +265,13 @@ export default function OrderDetailsPage() {
                   <User className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-base font-bold text-slate-800 truncate">{order.customerName}</div>
+                  <div className="text-base font-bold text-slate-800 truncate">{order.customerName || "Cliente"}</div>
                   <a 
-                    href={`tel:${order.customerPhone}`}
+                    href={`tel:${order.customerPhone || ""}`}
                     className="text-sm text-slate-500 hover:text-violet-600 flex items-center gap-1.5 mt-0.5 font-medium"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    <span>{formatPhone(order.customerPhone)}</span>
+                    <span>{formatPhone(order.customerPhone || "")}</span>
                   </a>
                 </div>
               </div>
@@ -327,42 +305,42 @@ export default function OrderDetailsPage() {
             <h3 className="text-sm uppercase tracking-wider text-slate-400 font-bold">Resumo Financeiro</h3>
             <div className="space-y-2.5 pt-1">
               <div className="flex justify-between text-slate-500">
-                <span>Total dos itens ({order.items.length})</span>
-                <span>R$ {order.itemsTotal.toFixed(2)}</span>
+                <span>Total dos itens ({(order.items || []).length})</span>
+                <span>R$ {Number(order.itemsTotal || 0).toFixed(2)}</span>
               </div>
-              {order.couponDiscount ? (
+              {Number(order.couponDiscount || 0) > 0 ? (
                 <div className="flex justify-between text-rose-600">
                   <span>Desconto Cupom</span>
-                  <span>-R$ {order.couponDiscount.toFixed(2)}</span>
+                  <span>-R$ {Number(order.couponDiscount).toFixed(2)}</span>
                 </div>
               ) : null}
-              {order.paymentDiscount ? (
+              {Number(order.paymentDiscount || 0) > 0 ? (
                 <div className="flex justify-between text-rose-600">
                   <span>Desconto Pagamento</span>
-                  <span>-R$ {order.paymentDiscount.toFixed(2)}</span>
+                  <span>-R$ {Number(order.paymentDiscount).toFixed(2)}</span>
                 </div>
               ) : null}
-              {order.receiptDiscount ? (
+              {Number(order.receiptDiscount || 0) > 0 ? (
                 <div className="flex justify-between text-rose-600">
                   <span>Desconto Recebimento</span>
-                  <span>-R$ {order.receiptDiscount.toFixed(2)}</span>
+                  <span>-R$ {Number(order.receiptDiscount).toFixed(2)}</span>
                 </div>
               ) : null}
-              {order.installmentSurcharge ? (
+              {Number(order.installmentSurcharge || 0) > 0 ? (
                 <div className="flex justify-between text-slate-500">
                   <span>Acréscimo Parcelamento</span>
-                  <span>+R$ {order.installmentSurcharge.toFixed(2)}</span>
+                  <span>+R$ {Number(order.installmentSurcharge).toFixed(2)}</span>
                 </div>
               ) : null}
-              {order.receiptSurcharge ? (
+              {Number(order.receiptSurcharge || 0) > 0 ? (
                 <div className="flex justify-between text-slate-500">
                   <span>Acréscimo Recebimento</span>
-                  <span>+R$ {order.receiptSurcharge.toFixed(2)}</span>
+                  <span>+R$ {Number(order.receiptSurcharge).toFixed(2)}</span>
                 </div>
               ) : null}
               <div className="flex justify-between font-bold text-slate-800 border-t border-slate-100 pt-3 text-base">
                 <span>Total do pedido</span>
-                <span>R$ {order.totalOrder.toFixed(2)}</span>
+                <span>R$ {Number(order.totalOrder || 0).toFixed(2)}</span>
               </div>
             </div>
           </div>

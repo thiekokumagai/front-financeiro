@@ -241,21 +241,13 @@ export default function ProductDetailsPage() {
                   {...form.register("costPrice")}
                 />
               </div>
-
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="stock">Estoque Inicial</Label>
-                <Input
-                  id="stock"
-                  type="number"
-                  placeholder="0"
-                  {...form.register("stock")}
-                />
-              </div>
             </div>
 
-            <div className="flex items-center space-x-2 pt-4 border-t">
-              <Switch id="isVisible" checked={isVisible} onCheckedChange={setIsVisible} />
-              <Label htmlFor="isVisible">Visível no catálogo</Label>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t">
+              <div className="flex items-center space-x-2">
+                <Switch id="isVisible" checked={isVisible} onCheckedChange={setIsVisible} />
+                <Label htmlFor="isVisible">Visível no catálogo</Label>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -263,11 +255,15 @@ export default function ProductDetailsPage() {
 
       {!isNewProduct && (
         <Card>
-          <CardHeader>
-            <CardTitle>Ajuste Rápido de Estoque</CardTitle>
-            <CardDescription>
-              Estoque Atual: <span className="font-bold text-foreground">{product?.stock ?? 0}</span>
-            </CardDescription>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle>Ajuste Rápido de Estoque</CardTitle>
+              <CardDescription>
+                Estoque Atual: <span className="font-bold text-foreground">{product?.stock ?? 0}</span>
+              </CardDescription>
+            </div>
+
+            
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
@@ -350,6 +346,17 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
             )}
+            <div className="flex justify-end pt-2">
+              <Button
+                type="button"
+                onClick={form.handleSubmit((v) => saveMutation.mutate(v))}
+                disabled={saveMutation.isPending}
+                className="gap-2 w-full sm:w-auto shrink-0"
+              >
+                <Save className="h-4 w-4" />
+                {saveMutation.isPending ? "Salvando..." : "Salvar Produto"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}

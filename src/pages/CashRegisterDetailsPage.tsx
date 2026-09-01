@@ -300,17 +300,6 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
             </CardContent>
           </Card>
 
-          <Card className="border-sky-100 bg-sky-50/10 rounded-2xl shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-sky-800 font-bold">Investimento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-black text-sky-600">
-                {currencyFormatter.format(summary.totalInvestment || 0)}
-              </p>
-            </CardContent>
-          </Card>
-
           <Card className="border-indigo-100 bg-indigo-50/10 rounded-2xl shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs uppercase tracking-wider text-indigo-800 font-bold">Custo de Produto</CardTitle>
@@ -362,17 +351,6 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
             <CardContent>
               <p className="text-2xl font-black text-orange-600">
                 {currencyFormatter.format(summary.motoboyOutflows || 0)}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-pink-100 bg-pink-50/10 rounded-2xl shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-pink-800 font-bold">Marketing</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-black text-pink-600">
-                {currencyFormatter.format(summary.marketingOutflows || 0)}
               </p>
             </CardContent>
           </Card>
@@ -795,7 +773,6 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
                   <SelectContent>
                     <SelectItem value="GENERAL">Geral</SelectItem>
                     <SelectItem value="MOTOBOY">Motoboy / Frete</SelectItem>
-                    <SelectItem value="MARKETING">Marketing / Publicidade</SelectItem>
                     <SelectItem value="FIXED_COSTS">Contas Fixas / Despesas Manuais</SelectItem>
                     <SelectItem value="PARTNERS">Pró-Labore / Sócios</SelectItem>
                     <SelectItem value="INVESTMENT">Transferência p/ Investimento</SelectItem>

@@ -112,8 +112,4 @@ export async function markOrderPrinted(id: string): Promise<void> {
   });
 }
 
-export async function reprintOrder(id: string): Promise<void> {
-  await apiFetch(`/orders/${id}/reprint`, {
-    method: "POST",
-  });
-}
+

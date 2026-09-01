@@ -1,4 +1,4 @@
-import { useOrderDetails, useCancelOrder, useReceiveOrder, useRevertReceiveOrder, useUpdateOrderStatus, useReprintOrder } from "@/hooks/useOrders";
+import { useOrderDetails, useCancelOrder, useReceiveOrder, useRevertReceiveOrder, useUpdateOrderStatus } from "@/hooks/useOrders";
 import { useSettings } from "@/hooks/useSettings";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -11,7 +11,6 @@ import {
   ArrowLeft, 
   Send, 
   Copy, 
-  Printer, 
   Edit, 
   User, 
   Phone, 
@@ -71,7 +70,6 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
   const receiveMutation = useReceiveOrder();
   const revertReceiveMutation = useRevertReceiveOrder();
   const updateStatusMutation = useUpdateOrderStatus();
-  const reprintMutation = useReprintOrder();
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [localStatus, setLocalStatus] = useState<OrderStatus | "">("");
@@ -515,22 +513,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
     }
   };
 
-  const handleReprintOrder = async () => {
-    if (!orderId) return;
-    try {
-      await reprintMutation.mutateAsync(orderId);
-      toast({
-        title: "Reimpressão enviada",
-        description: `O pedido #${order?.orderNumber} foi enviado para a impressora.`,
-      });
-    } catch (err: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao imprimir",
-        description: err.message || "Ocorreu um erro ao processar a reimpressão.",
-      });
-    }
-  };
+
 
   const handleSendWhatsApp = () => {
     if (!order) return;
@@ -584,17 +567,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
 
                 {/* Quick actions top-right */}
                 <div className="flex items-center gap-1.5">
-                  {/* 1. Imprimir na máquina (Print Agent) */}
-                  {order.status !== 'CANCELLED' && (
-                    <button 
-                      onClick={handleReprintOrder}
-                      disabled={reprintMutation.isPending}
-                      className="w-8 h-8 rounded-full bg-violet-50 hover:bg-violet-100 flex items-center justify-center text-violet-600 hover:text-violet-700 transition-colors disabled:opacity-50" 
-                      title="Imprimir"
-                    >
-                      {reprintMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
-                    </button>
-                  )}
+
                   
                   {/* 2. Compartilhar */}
                   <button 
@@ -698,23 +671,9 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                 <div className="space-y-3 bg-white rounded-xl border border-slate-200/60 p-4 shadow-sm">
                   {order.items.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 relative">
-                      {/* Product Image */}
-                      <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-slate-200/50">
-                        {item.imageUrl ? (
-                          <img
-                            src={buildImageUrl(item.imageUrl)}
-                            alt={item.productName}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-slate-100 flex items-center justify-center">
-                            <span className="text-[10px] text-slate-400 font-medium text-center leading-none px-1">Sem foto</span>
-                          </div>
-                        )}
-                        {/* Quantity Badge */}
-                        <div className="absolute -top-1.5 -left-1.5 min-w-[35px] h-[35px] rounded-full bg-blue-600 text-white flex items-center justify-center text-[15px] font-bold px-1 shadow-sm z-10">
-                          {item.quantity}
-                        </div>
+                      {/* Quantity Badge */}
+                      <div className="min-w-[28px] h-[28px] rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold px-1 shadow-sm shrink-0">
+                        {item.quantity}
                       </div>
 
                       {/* Product Name and Price */}
@@ -947,36 +906,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                 )}
               </div>
 
-              {/* Shipping Address Section */}
-              <div className="bg-white rounded-xl border border-slate-200/60 p-4 shadow-sm space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">Endereço de Entrega</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleCopyAddress}
-                    className="h-7 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-50 px-2 gap-1 rounded-md"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="h-3 w-3" />
-                        <span>Copiado</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3 w-3" />
-                        <span>Copiar endereço</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-                <div className="text-xs text-slate-600 leading-relaxed font-medium space-y-0.5">
-                  <div className="font-bold text-slate-800">{order.street}, {order.number}</div>
-                  {order.complement && <div>{order.complement}</div>}
-                  <div>{order.neighborhood} - {order.city}/{order.state}</div>
-                  <div>CEP: {order.cep}</div>
-                </div>
-              </div>
+
 
               {/* Observação Section */}
               {order.observation && (

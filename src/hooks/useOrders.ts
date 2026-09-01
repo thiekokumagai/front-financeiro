@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import { getOrders, getOrderById, cancelOrder, receiveOrder, revertReceiveOrder, updateOrderStatus, markOrderPrinted, reprintOrder, updateOrder } from "@/services/order.service";
+import { getOrders, getOrderById, cancelOrder, receiveOrder, revertReceiveOrder, updateOrderStatus, markOrderPrinted, updateOrder } from "@/services/order.service";
 import { OrderStatus, PaymentStatus } from "@/types/order";
 
 export function useOrders(
@@ -114,11 +114,7 @@ export function useMarkOrderAsPrinted() {
   });
 }
 
-export function useReprintOrder() {
-  return useMutation({
-    mutationFn: (id: string) => reprintOrder(id),
-  });
-}
+
 
 export function useUpdateOrderFull() {
   const queryClient = useQueryClient();

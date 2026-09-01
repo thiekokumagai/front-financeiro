@@ -73,22 +73,7 @@ export function PushNotificationManager() {
 
   // Removido aviso duplicado de PWA Update, pois já existe no PWAUpdatePrompt.tsx
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      let refreshing = false;
-      const handleControllerChange = () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload();
-        }
-      };
 
-      navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
-      return () => {
-        navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
-      };
-    }
-  }, []);
 
   useEffect(() => {
     if (!('Notification' in window)) return;

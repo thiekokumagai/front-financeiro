@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, ShoppingBag, TrendingUp, Package, Calendar, RefreshCw, CheckCircle, XCircle, Users, MousePointerClick, Clock, ShoppingCart } from "lucide-react";
+import { DollarSign, ShoppingBag, TrendingUp, Package, Calendar, RefreshCw, CheckCircle, XCircle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getDashboardStats, DashboardKPIs, DashboardChartItem, BestSellerItem } from "@/services/dashboard.service";
 import { getCategories } from "@/services/category.service";
@@ -152,30 +152,6 @@ export default function DashboardPage() {
       value: stats ? stats.totalProdutosVendidos : 0,
       icon: Package,
       color: "text-warning bg-warning/10",
-    },
-    {
-      label: "Visitas",
-      value: stats?.visitas ?? "--",
-      icon: Users,
-      color: "text-indigo-600 bg-indigo-100",
-    },
-    {
-      label: "Conversão",
-      value: stats ? `${stats.conversao}%` : "--",
-      icon: MousePointerClick,
-      color: "text-rose-600 bg-rose-100",
-    },
-    {
-      label: "Tempo Médio",
-      value: stats ? `${stats.tempoMedio} min` : "--",
-      icon: Clock,
-      color: "text-purple-600 bg-purple-100",
-    },
-    {
-      label: "Carrinhos Abandonados",
-      value: stats?.abandonos ?? "--",
-      icon: ShoppingCart,
-      color: "text-amber-600 bg-amber-100",
     },
   ];
 

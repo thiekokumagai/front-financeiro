@@ -22,20 +22,15 @@ import { PageLoader } from "@/components/common/PageLoader";
 
 import {
   GripVertical,
-  ImagePlus,
   Loader2,
   Plus,
-  RefreshCw,
   Trash2,
-  X,
   Pencil,
-  Link,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
 
 import { useCategories } from "@/hooks/useCategories";
-import { useSettings } from "@/hooks/useSettings";
 import {
   createCategory,
   updateCategory,
@@ -43,8 +38,6 @@ import {
   updateCategoryOrderBatch,
 } from "@/services/category.service";
 
-import { buildImageUrl } from "@/utils/image-url";
-import { getStoreUrl } from "@/utils/store-url";
 import type { CategoryList } from "@/types/category";
 
 import {
@@ -54,22 +47,16 @@ import {
 
 export default function CategoriesPage() {
   const { data: categories, loading, reload } = useCategories();
-  const { data: settings } = useSettings();
 
   const [localCategories, setLocalCategories] = useState<CategoryList[]>([]);
   const [editingCategory, setEditingCategory] = useState<CategoryList | null>(
     null,
   );
-  const [subdomain, setSubdomain] = useState<string>("");
 
   const [open, setOpen] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const [isSaving, setIsSaving] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const [imagePreview, setImagePreview] = useState("");
-  const [removeImage, setRemoveImage] = useState(false);
 
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
   const isSavingOrderRef = useRef(false);
@@ -78,7 +65,6 @@ export default function CategoriesPage() {
     register,
     handleSubmit,
     control,
-    setValue,
     watch,
     reset,
     formState: { errors },
@@ -93,51 +79,17 @@ export default function CategoriesPage() {
     },
   });
 
-  const file = watch("file") as File | null;
-  const watchedTitle = watch("title") || "";
-  const watchedIsVisible = watch("isVisible");
-  const watchedExcludeFromBestSeller = watch("excludeFromBestSeller");
 
-  const canShowEditButton =
-    !editingCategory ||
-    watchedTitle.trim() !== (editingCategory.title || "").trim() ||
-    watchedIsVisible !== editingCategory.isVisible ||
-    watchedExcludeFromBestSeller !== (editingCategory.excludeFromBestSeller || false) ||
-    (watch("oldUrl") || "") !== (editingCategory.oldUrl || "") ||
-    file !== null ||
-    removeImage;
 
   useEffect(() => {
     if (categories) setLocalCategories(categories);
   }, [categories]);
 
   useEffect(() => {
-    if (settings && (settings as any).storeId) {
-      import("@/services/api").then(({ apiFetch }) => {
-        apiFetch(`/stores/${(settings as any).storeId}`)
-          .then((res) => res.json())
-          .then((data) => {
-            if (data?.subdomain) setSubdomain(data.subdomain);
-          })
-          .catch(() => {});
-      });
-    }
-  }, [settings]);
-
-  useEffect(() => {
     return () => {
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
   }, []);
-
-  useEffect(() => {
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    setImagePreview(url);
-
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
 
   const saveOrder = async (items: CategoryList[]) => {
     if (isSavingOrderRef.current) return;
@@ -230,8 +182,6 @@ export default function CategoriesPage() {
 
   const openCreate = () => {
     setEditingCategory(null);
-    setImagePreview("");
-    setRemoveImage(false);
 
     reset({
       title: "",
@@ -246,9 +196,6 @@ export default function CategoriesPage() {
 
   const openEdit = (category: CategoryList) => {
     setEditingCategory(category);
-
-    setImagePreview(category.image ? buildImageUrl(category.image) : "");
-    setRemoveImage(false);
 
     reset({
       title: category.title,
@@ -272,7 +219,6 @@ export default function CategoriesPage() {
           isVisible: data.isVisible,
           excludeFromBestSeller: data.excludeFromBestSeller,
           oldUrl: data.oldUrl,
-          removeImage,
         });
 
         toast({ title: "Categoria atualizada" });
@@ -298,8 +244,6 @@ export default function CategoriesPage() {
 
       setOpen(false);
       setEditingCategory(null);
-      setImagePreview("");
-      setRemoveImage(false);
 
       await reload();
     } catch {
@@ -312,15 +256,7 @@ export default function CategoriesPage() {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextFile = e.target.files?.[0];
-    if (!nextFile) return;
-
-    setValue("file", nextFile);
-    setRemoveImage(false);
-
-    setImagePreview(URL.createObjectURL(nextFile));
-  };
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja deletar?")) return;
@@ -340,16 +276,6 @@ export default function CategoriesPage() {
     }
   };
 
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-
-  const handleCopyLink = (category: CategoryList) => {
-    const baseUrl = subdomain ? getStoreUrl(subdomain) : (import.meta.env.VITE_STORE_URL || window.location.origin.replace("admin.", ""));
-    const slug = category.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
-    const link = `${baseUrl}/${slug}`;
-    navigator.clipboard.writeText(link);
-    toast({ title: "Link copiado para a área de transferência!" });
-  };
-
   if (loading && localCategories.length === 0) {
     return <PageLoader message="Carregando categorias..." />;
   }
@@ -365,22 +291,6 @@ export default function CategoriesPage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-          <Button
-            variant="outline"
-            onClick={async () => {
-              setIsRefreshing(true);
-              await reload();
-              setIsRefreshing(false);
-            }}
-          >
-            {isRefreshing ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
-            Atualizar
-          </Button>
-
           <Button onClick={openCreate}>
             <Plus className="mr-1 h-4 w-4" />
             Nova Categoria
@@ -438,12 +348,6 @@ export default function CategoriesPage() {
             <div className="flex items-center gap-3">
               <GripVertical className="hidden h-5 w-5 text-muted-foreground shrink-0 active:cursor-grabbing cursor-grab" />
               
-              {c.image ? (
-                <img src={buildImageUrl(c.image)} className="h-12 w-12 rounded-full object-cover shrink-0 border" />
-              ) : (
-                <div className="h-12 w-12 rounded-full bg-muted shrink-0 border flex items-center justify-center text-xs text-muted-foreground">—</div>
-              )}
-              
               <div className="flex flex-col flex-1 min-w-0">
                 <Badge variant={c.isVisible ? "default" : "secondary"} className="w-fit mt-1 py-0 text-[10px]">
                   {c.isVisible ? "Ativa" : "Inativa"}
@@ -451,9 +355,6 @@ export default function CategoriesPage() {
               </div>
               
               <div className="flex items-center gap-1 shrink-0">
-                <Button size="icon" variant="ghost" onClick={() => handleCopyLink(c)} className="h-8 w-8" title="Copiar link da categoria">
-                  <Link className="h-4 w-4 text-primary" />
-                </Button>
                 <Button size="icon" variant="ghost" onClick={() => openEdit(c)} className="h-8 w-8">
                   <Pencil className="h-4 w-4 text-slate-600" />
                 </Button>
@@ -478,7 +379,6 @@ export default function CategoriesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead />
-                <TableHead>Imagem</TableHead>
                 <TableHead>Título</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead />
@@ -503,17 +403,6 @@ export default function CategoriesPage() {
                     <GripVertical className="h-4 w-4 text-muted-foreground hover:cursor-grabbing" />
                   </TableCell>
 
-                  <TableCell>
-                    {c.image ? (
-                      <img
-                        src={buildImageUrl(c.image)}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-muted" />
-                    )}
-                  </TableCell>
-
                   <TableCell>{c.title}</TableCell>
 
                   <TableCell>
@@ -523,14 +412,6 @@ export default function CategoriesPage() {
                   </TableCell>
 
                   <TableCell>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleCopyLink(c)}
-                      title="Copiar link da categoria"
-                    >
-                      <Link className="h-4 w-4 text-primary" />
-                    </Button>
                     <Button
                       size="icon"
                       variant="ghost"
@@ -566,38 +447,6 @@ export default function CategoriesPage() {
           </DialogTitle>
 
           <div className="space-y-4">
-            <div className="flex justify-center">
-              {imagePreview ? (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    className="h-24 w-24 rounded-full object-cover"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("file", null);
-                      setImagePreview("");
-                      setRemoveImage(true);
-                    }}
-                    className="absolute -top-2 -right-2 bg-destructive p-1 rounded-full"
-                  >
-                    <X className="h-3 w-3 text-white" />
-                  </button>
-                </div>
-              ) : (
-                <label className="h-24 w-24 flex items-center justify-center border-2 border-dashed rounded-full cursor-pointer">
-                  <ImagePlus className="h-6 w-6 text-muted-foreground" />
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </label>
-              )}
-            </div>
             <div>
               <Label>Título</Label>
               <Input {...register("title")} />
@@ -622,30 +471,14 @@ export default function CategoriesPage() {
               )}
             />
 
-            <Controller
-              name="excludeFromBestSeller"
-              control={control}
-              render={({ field }) => (
-                <div className="flex items-center justify-between">
-                  <Label>Ocultar do Ranking Best Seller</Label>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </div>
-              )}
-            />
-
-            {canShowEditButton ? (
-              <Button
-                className="w-full"
-                onClick={handleSubmit(onSubmit)}
-                disabled={isSaving}
-              >
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {editingCategory ? "Editar" : "Criar"}
-              </Button>
-            ) : null}
+            <Button
+              className="w-full"
+              onClick={handleSubmit(onSubmit)}
+              disabled={isSaving}
+            >
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {editingCategory ? "Editar" : "Criar"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

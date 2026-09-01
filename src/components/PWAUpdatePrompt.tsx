@@ -11,12 +11,11 @@ export function PWAUpdatePrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegisteredSW(swScriptUrl, registration) {
-      if (registration) {
-        // Checar por atualizações no servidor a cada 20s e ao focar/reabrir o app
+      if (!import.meta.env.DEV && registration) {
+        // Checar por atualizações no servidor em produção a cada 60s
         const checkUpdate = async () => {
           if (!navigator.onLine) return;
           try {
-            // Bypass HTTP cache para garantir que pega o sw.js atualizado do servidor
             await fetch(swScriptUrl, { cache: 'no-store', headers: { 'cache-control': 'no-cache' } });
             await registration.update();
           } catch (e) {
@@ -24,7 +23,7 @@ export function PWAUpdatePrompt() {
           }
         };
 
-        const interval = setInterval(checkUpdate, 20000);
+        const interval = setInterval(checkUpdate, 60000);
         window.addEventListener("focus", checkUpdate);
         window.addEventListener("online", checkUpdate);
       }
