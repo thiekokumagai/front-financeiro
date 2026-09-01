@@ -158,10 +158,10 @@ export default function PublicCatalogPage() {
           <div className="space-y-1">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-amber-400 bg-amber-400/10 px-3.5 py-1 rounded-full border border-amber-400/20">
               <Sparkles className="h-3 w-3 text-amber-400" />
-              {settings?.storeName || "FINANCEIRO"}
+              Catálogo de Produtos
             </span>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
-              Catálogo de Produtos
+              {settings?.storeName || "FINANCEIRO"}
             </h1>
             {settings?.topHeaderText && (
               <p className="text-xs text-zinc-400 font-medium max-w-md">

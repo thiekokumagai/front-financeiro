@@ -27,7 +27,7 @@ export async function getPublicStoreCategories(): Promise<Category[]> {
 }
 
 export async function getPublicStoreProducts(): Promise<Product[]> {
-  const response = await apiFetch("/store/products");
+  const response = await apiFetch("/store/products?limit=1000");
   const data = await response.json();
   return data.data || data;
 }

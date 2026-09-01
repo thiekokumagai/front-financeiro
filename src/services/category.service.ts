@@ -10,46 +10,31 @@ export async function getCategories(): Promise<CategoryList[]> {
 export async function createCategory(
   form: CreateCategoryDTO
 ): Promise<void> {
-  const body = new FormData();
-  body.append("title", form.title.trim());
-  if (form.file) {
-    body.append("file", form.file);
-  }
-  body.append("isVisible", form.isVisible ? "true" : "false");
-    if (form.excludeFromBestSeller !== undefined) {
-      body.append("excludeFromBestSeller", String(form.excludeFromBestSeller));
-    }
+  const payload = {
+    title: form.title.trim(),
+    isVisible: form.isVisible ?? true,
+    excludeFromBestSeller: form.excludeFromBestSeller ?? false,
+  };
+
   await apiFetch("/categories", {
     method: "POST",
-    body,
+    body: JSON.stringify(payload),
   });
 }
+
 export async function updateCategory(
   id: string,
   form: UpdateCategoryDTO
 ): Promise<void> {
-  const body = new FormData();
+  const payload = {
+    ...(form.title ? { title: form.title.trim() } : {}),
+    ...(form.isVisible !== undefined ? { isVisible: form.isVisible } : {}),
+    ...(form.excludeFromBestSeller !== undefined ? { excludeFromBestSeller: form.excludeFromBestSeller } : {}),
+  };
 
-  if (form.title) {
-    body.append("title", form.title);
-  }
-
-  if (form.file) {
-    body.append("file", form.file);
-  }
-
-  if (form.isVisible !== undefined) {
-    body.append("isVisible", form.isVisible ? "true" : "false");
-  }
-  if (form.removeImage !== undefined) {
-    body.append("removeImage", form.removeImage ? "true" : "false");
-  }
-  if (form.excludeFromBestSeller !== undefined) {
-    body.append("excludeFromBestSeller", form.excludeFromBestSeller ? "true" : "false");
-  }
   await apiFetch(`/categories/${id}`, {
     method: "PATCH",
-    body,
+    body: JSON.stringify(payload),
   });
 }
 export async function deleteCategory(id: string): Promise<void> {

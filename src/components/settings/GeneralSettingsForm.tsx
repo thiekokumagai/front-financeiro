@@ -17,22 +17,13 @@ export function GeneralSettingsForm() {
 
   useEffect(() => {
     if (settings) {
-      const cleanVal = (val: string | null | undefined, defaults: string[]) => {
+      setStoreName(settings.storeName || "");
+      const cleanPhone = (val: string | null | undefined) => {
         if (!val) return "";
-        const trimmed = val.trim();
-        return defaults.some((d) => d.toLowerCase() === trimmed.toLowerCase())
-          ? ""
-          : val;
+        const defaults = ["(67) 99999-9999", "67999999999", "6799999-9999"];
+        return defaults.some((d) => d.toLowerCase() === val.trim().toLowerCase()) ? "" : val;
       };
-
-      setStoreName(cleanVal(settings.storeName, ["Minha Loja", "Financeiro"]));
-      setPhone(
-        cleanVal(settings.phone, [
-          "(67) 99999-9999",
-          "67999999999",
-          "6799999-9999",
-        ])
-      );
+      setPhone(cleanPhone(settings.phone));
     }
   }, [settings]);
 
