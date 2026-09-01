@@ -11,56 +11,31 @@
       rel="stylesheet"
     />
     <!-- TODO: Set the document title to the name of your application -->
-    <title>Admin</title>
-    <meta name="description" id="meta-desc" content="Admin Dashboard">
-    <meta name="author" id="meta-author" content="Loja" />
+    <title>Financeiro</title>
+    <meta name="description" id="meta-desc" content="Sistema Financeiro">
+    <meta name="author" id="meta-author" content="Financeiro" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    
-    
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/10fbbc4f-62aa-431d-aca6-af27a6db31cf/id-preview-87e4e58b--396ab09a-c3a3-40d3-93bb-55c8fe9b5617.Pod e Mais.app-1774480688206.png">
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@store" />
-    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/10fbbc4f-62aa-431d-aca6-af27a6db31cf/id-preview-87e4e58b--396ab09a-c3a3-40d3-93bb-55c8fe9b5617.Pod e Mais.app-1774480688206.png">
-    <meta property="og:title" id="og-title" content="App">
-    <meta name="twitter:title" id="twitter-title" content="App">
-    <meta property="og:description" id="og-desc" content="Admin Dashboard">
-    <meta name="twitter:description" id="twitter-desc" content="Admin Dashboard">
+    <meta property="og:title" id="og-title" content="Financeiro">
+    <meta name="twitter:title" id="twitter-title" content="Financeiro">
+    <meta property="og:description" id="og-desc" content="Sistema Financeiro">
+    <meta name="twitter:description" id="twitter-desc" content="Sistema Financeiro">
     <link rel="icon" type="image/png" href="/favicon-192x192.png">
     <link rel="apple-touch-icon" href="/favicon-192x192.png">
     
     <script>
-      fetch('%VITE_ADMIN_API%/store/settings/manifest.json')
-        .then(res => {
-          if (!res.ok) throw new Error('Not OK');
-          return res.json();
-        })
-        .then(data => {
-          if (data && data.name && typeof data.name === 'string') {
-            document.title = data.name;
-            const metaAuthor = document.getElementById('meta-author');
-            if (metaAuthor) metaAuthor.content = data.name;
-            const metaDesc = document.getElementById('meta-desc');
-            if (metaDesc) metaDesc.content = data.description || 'Admin Dashboard';
-            const ogTitle = document.getElementById('og-title');
-            if (ogTitle) ogTitle.content = data.name + ' App';
-            const twitterTitle = document.getElementById('twitter-title');
-            if (twitterTitle) twitterTitle.content = data.name + ' App';
-            if (data.icons && data.icons.length > 0) {
-              const icon192 = data.icons.find(i => i.sizes === '192x192') || data.icons[0];
-              if (icon192 && icon192.src) {
-                const link = document.querySelector("link[rel~='icon']");
-                if (link) link.href = icon192.src;
-                const appleLink = document.querySelector("link[rel='apple-touch-icon']");
-                if (appleLink) appleLink.href = icon192.src;
+      try {
+        const apiUrl = '%VITE_ADMIN_API%';
+        if (apiUrl && !apiUrl.startsWith('%')) {
+          fetch(apiUrl + '/store/settings/manifest.json')
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+              if (data && data.name) {
+                document.title = data.name;
               }
-            }
-          }
-        }).catch(e => {
-          document.title = 'Super Admin | Financeiro';
-        });
+            }).catch(() => {});
+        }
+      } catch (e) {}
     </script>
   <link rel="manifest" href="%VITE_ADMIN_API%/store/settings/manifest.json" crossorigin="anonymous">
 </head>

@@ -89,9 +89,7 @@ export function AdminSidebar() {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 text-white font-bold text-sm">
-                LP
-              </div>
+              <img src="/logo-white.png" alt="Financeiro Logo" className="w-9 h-9 object-contain shrink-0" />
               {!collapsed && (
                 <span className="text-sidebar-foreground font-bold text-base tracking-tight">
                   {superAdmin ? "Super Admin" : "Financeiro"}

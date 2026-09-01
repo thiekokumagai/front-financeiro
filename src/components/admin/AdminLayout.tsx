@@ -99,10 +99,11 @@ export function AdminLayout() {
         <AdminSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex h-14 shrink-0 items-center justify-between bg-card px-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <SidebarTrigger>
                 <Menu className="h-5 w-5" />
               </SidebarTrigger>
+              <img src="/logo-black.png" alt="Financeiro" className="h-7 w-auto object-contain sm:hidden" />
             </div>
             <div className="flex items-center gap-3">
               {!superAdmin && (

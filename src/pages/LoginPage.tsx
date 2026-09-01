@@ -79,13 +79,11 @@ export default function LoginPage() {
       <div className="login-orb login-orb-small absolute right-[20%] top-[12%] h-32 w-32 rounded-full" aria-hidden="true" />
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="login-brand mb-7 flex items-center justify-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-300/30 bg-emerald-400/10 shadow-[0_0_32px_rgba(52,211,153,0.2)] backdrop-blur-md">
-            <LockKeyhole className="h-5 w-5 text-emerald-300" aria-hidden="true" />
-          </span>
-          <div className="text-left">
+        <div className="login-brand mb-7 flex flex-col items-center justify-center gap-3">
+          <img src="/logo-white.png" alt="Financeiro Logo" className="h-16 w-auto object-contain drop-shadow-md" />
+          <div className="text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Área segura</p>
-            <p className="text-sm text-slate-400">Painel administrativo</p>
+            <p className="text-sm text-slate-400">Financeiro - Painel Administrativo</p>
           </div>
         </div>
 
