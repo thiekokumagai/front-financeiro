@@ -58,15 +58,6 @@ export default function DigitalCatalogAdminPage() {
             {copied ? <Check className="h-4 w-4 text-zinc-950" /> : <Copy className="h-4 w-4" />}
             <span>{copied ? "Link Copiado!" : "Copiar Link Público"}</span>
           </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => window.open(catalogUrl, "_blank")}
-            className="bg-white text-zinc-950 hover:bg-slate-200 font-bold gap-2 rounded-xl border border-zinc-200 shadow-sm"
-          >
-            <ExternalLink className="h-4 w-4 text-zinc-950" />
-            <span>Abrir Catálogo</span>
-          </Button>
         </div>
       </div>
 
@@ -123,16 +114,6 @@ export default function DigitalCatalogAdminPage() {
                 <div>
                   <span className="font-bold text-slate-800 block">Sincronização Dinâmica</span>
                   <span>Produtos e preços são atualizados automaticamente quando você altera na plataforma.</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white border border-slate-100 shadow-2xs">
-                <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 shrink-0">
-                  <MessageCircle className="h-4 w-4" />
-                </div>
-                <div>
-                  <span className="font-bold text-slate-800 block">Pedido via WhatsApp</span>
-                  <span>O cliente escolhe as quantidades e o botão inferior monta a mensagem do pedido pronta.</span>
                 </div>
               </div>
 

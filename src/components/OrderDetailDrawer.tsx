@@ -543,9 +543,21 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
       }
     }
 
+    let pixDetailsText = "";
+    if (order.paymentMethod === 'pix' || order.paymentMethod === 'PIX') {
+      const keyToUse = settings?.pixKey || order.pixKey;
+      const holderToUse = settings?.pixHolder;
+      if (keyToUse) {
+        pixDetailsText += `\n\n🔑 *DADOS PARA PAGAMENTO PIX:*\n*Chave PIX:* ${keyToUse}`;
+        if (holderToUse) {
+          pixDetailsText += `\n*Titular:* ${holderToUse}`;
+        }
+      }
+    }
+
     const totalStr = formatCurrency(Number(order.totalOrder || order.totalReceived || 0));
 
-    const text = `Olá *${order.customerName}*! 🛒\n\nSegue o comprovante do seu pedido *#${order.orderNumber || ''}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
+    const text = `Olá *${order.customerName}*! 🛒\n\nSegue o comprovante do seu pedido *#${order.orderNumber || ''}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}${pixDetailsText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
 
     openWhatsApp({
       phone: numero,

@@ -18,6 +18,7 @@ interface OrderItem {
   title: string;
   price: number;
   quantity: number;
+  maxStock?: number;
 }
 
 export default function EditOrderPage() {
@@ -134,9 +135,17 @@ export default function EditOrderPage() {
     setOrderItems((prev) => {
       const existing = prev.find((item) => item.productId === product.id);
       if (existing) {
+        if (existing.quantity >= product.stock) {
+          toast({
+            variant: "destructive",
+            title: "Estoque insuficiente",
+            description: `O produto "${product.title}" possui apenas ${product.stock} unidade(s) em estoque.`,
+          });
+          return prev;
+        }
         return prev.map((item) =>
           item.productId === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + 1, maxStock: product.stock }
             : item
         );
       }
@@ -147,6 +156,7 @@ export default function EditOrderPage() {
           title: product.title,
           price: product.price || 0,
           quantity: 1,
+          maxStock: product.stock,
         },
       ];
     });
@@ -158,6 +168,14 @@ export default function EditOrderPage() {
       const newQty = item.quantity + delta;
       if (newQty <= 0) {
         return prev.filter((_, i) => i !== index);
+      }
+      if (delta > 0 && item.maxStock !== undefined && newQty > item.maxStock) {
+        toast({
+          variant: "destructive",
+          title: "Estoque insuficiente",
+          description: `O produto "${item.title}" possui apenas ${item.maxStock} unidade(s) em estoque.`,
+        });
+        return prev;
       }
       return prev.map((it, i) => (i === index ? { ...it, quantity: newQty } : it));
     });

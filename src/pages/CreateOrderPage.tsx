@@ -104,9 +104,21 @@ export default function CreateOrderPage() {
       }
     }
 
+    let pixDetailsText = "";
+    if (order.paymentMethod === 'pix' || order.paymentMethod === 'PIX') {
+      const keyToUse = storeSettings?.pixKey || order.pixKey;
+      const holderToUse = storeSettings?.pixHolder;
+      if (keyToUse) {
+        pixDetailsText += `\n\n🔑 *DADOS PARA PAGAMENTO PIX:*\n*Chave PIX:* ${keyToUse}`;
+        if (holderToUse) {
+          pixDetailsText += `\n*Titular:* ${holderToUse}`;
+        }
+      }
+    }
+
     const totalStr = formatCurrency(Number(order.totalOrder || order.totalReceived || 0));
 
-    const text = `Olá *${customerName}*! 🛒\n\nSegue o comprovante do seu pedido *${orderNum}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
+    const text = `Olá *${customerName}*! 🛒\n\nSegue o comprovante do seu pedido *${orderNum}*:\n\n📦 *ITENS DO PEDIDO:*\n${itemsText}\n\n💳 *Forma de Pagamento:* ${paymentLabel}${extraCashText}${pixDetailsText}\n💰 *Total Final:* ${totalStr}\n\nObrigado pela preferência!`;
 
     openWhatsApp({
       phone,
@@ -176,9 +188,17 @@ export default function CreateOrderPage() {
     setOrderItems((prev) => {
       const existing = prev.find((item) => item.productId === product.id);
       if (existing) {
+        if (existing.quantity >= product.stock) {
+          toast({
+            variant: "destructive",
+            title: "Estoque insuficiente",
+            description: `O produto "${product.title}" possui apenas ${product.stock} unidade(s) em estoque.`,
+          });
+          return prev;
+        }
         return prev.map((item) =>
           item.productId === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + 1, maxStock: product.stock }
             : item
         );
       }
@@ -189,6 +209,7 @@ export default function CreateOrderPage() {
           title: product.title,
           price: product.price || 0,
           quantity: 1,
+          maxStock: product.stock,
         },
       ];
     });
@@ -200,6 +221,14 @@ export default function CreateOrderPage() {
       const newQty = item.quantity + delta;
       if (newQty <= 0) {
         return prev.filter((_, i) => i !== index);
+      }
+      if (delta > 0 && item.maxStock !== undefined && newQty > item.maxStock) {
+        toast({
+          variant: "destructive",
+          title: "Estoque insuficiente",
+          description: `O produto "${item.title}" possui apenas ${item.maxStock} unidade(s) em estoque.`,
+        });
+        return prev;
       }
       return prev.map((it, i) => (i === index ? { ...it, quantity: newQty } : it));
     });

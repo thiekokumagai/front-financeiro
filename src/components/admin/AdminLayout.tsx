@@ -108,20 +108,6 @@ export function AdminLayout() {
             <div className="flex items-center gap-3">
               {!superAdmin && (
                 <>
-                  {subdomain && (
-                    <a
-                      href={getStoreUrl(subdomain)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm"
-                      title="Abrir a vitrine da sua loja em nova aba"
-                    >
-                      <Store className="h-4 w-4 text-indigo-600" />
-                      <span className="hidden sm:inline">Acessar Loja</span>
-                      <ExternalLink className="h-3 w-3 opacity-75" />
-                    </a>
-                  )}
-
                   <Button variant="outline" size="icon" onClick={handleTestPush} title="Testar notificação" className="h-8 w-8 shrink-0">
                     <Bell className="h-4 w-4" />
                   </Button>
