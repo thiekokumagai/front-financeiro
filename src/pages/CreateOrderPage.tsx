@@ -160,13 +160,13 @@ export default function CreateOrderPage() {
 
   const effectiveCreditInstallments = paymentMethod === "Cartão de Crédito" ? creditInstallments : 1;
   const selectedInstallment = installmentsOptions.find((opt) => opt.value === effectiveCreditInstallments) ?? installmentsOptions[0];
-  const cardInterestAmount = paymentMethod === "Cartão de Crédito" 
+  const creditInterestAmount = paymentMethod === "Cartão de Crédito" 
     ? totalAfterCoupon * (selectedInstallment.interest / 100)
     : paymentMethod === "Cartão de Débito"
       ? totalAfterCoupon * (debitFeePercent / 100)
       : 0;
 
-  const total = discountedProductsTotal + cardInterestAmount;
+  const total = discountedProductsTotal + creditInterestAmount;
   const parsedCustomTotal = parseFloat(customTotal.replace(/\./g, '').replace(',', '.'));
   const finalTotal = !isNaN(parsedCustomTotal) && customTotal.trim() !== "" ? parsedCustomTotal : total;
 
