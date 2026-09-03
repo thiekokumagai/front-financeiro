@@ -6,6 +6,7 @@ import { buildImageUrl } from "@/utils/image-url";
 import { openWhatsApp } from "@/utils/whatsapp";
 import { ShoppingCart, MessageCircle, Plus, Minus, Search, Sparkles, Check, Share2, Copy } from "lucide-react";
 import { formatCurrency } from "@/utils/formatters";
+import { matchesProductSearch } from "@/utils/search";
 
 export default function PublicCatalogPage() {
   const [settings, setSettings] = useState<PublicStoreSettings | null>(null);
@@ -62,10 +63,7 @@ export default function PublicCatalogPage() {
       const matchesCategory =
         selectedCategory === "ALL" ||
         product.categoryId === selectedCategory;
-      const matchesSearch =
-        !searchQuery ||
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesSearch = matchesProductSearch(searchQuery, product);
       return matchesCategory && matchesSearch;
     });
   }, [products, selectedCategory, searchQuery]);
