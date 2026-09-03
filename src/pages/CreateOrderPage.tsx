@@ -255,6 +255,7 @@ export default function CreateOrderPage() {
         paymentMethod: paymentMethod === 'PIX' ? 'pix' : paymentMethod === 'Cartão de Crédito' ? 'credit' : paymentMethod === 'Cartão de Débito' ? 'debit' : paymentMethod === 'Dinheiro' ? 'cash' : paymentMethod,
         paymentStatus: isPaid ? "PAID" : "PENDING",
         installments: effectiveCreditInstallments,
+        installmentSurcharge: creditInterestAmount > 0 ? Math.round(creditInterestAmount * 100) / 100 : 0,
         amountProvided: amountProvidedVal,
         changeAmount: changeAmountVal,
         observation: orderNote || undefined,

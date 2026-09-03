@@ -346,7 +346,7 @@ export default function OrderDetailsPage() {
               ) : null}
               {Number(order.installmentSurcharge || 0) > 0 ? (
                 <div className="flex justify-between text-slate-500">
-                  <span>Acréscimo Parcelamento</span>
+                  <span>{order.paymentMethod === 'debit' || order.paymentMethod === 'Cartão de Débito' ? 'Taxa Débito' : 'Acréscimo / Juros Cartão'}</span>
                   <span>+R$ {Number(order.installmentSurcharge).toFixed(2)}</span>
                 </div>
               ) : null}

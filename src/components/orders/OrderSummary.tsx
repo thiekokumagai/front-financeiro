@@ -175,9 +175,9 @@ export function OrderSummary({
           </div>
         )}
 
-        {creditInterestAmount > 0 && paymentMethod === "Cartão de Crédito" && (
+        {creditInterestAmount > 0 && (paymentMethod === "Cartão de Crédito" || paymentMethod === "credit" || paymentMethod === "Cartão de Débito" || paymentMethod === "debit") && (
           <div className="flex justify-between text-rose-600 font-bold">
-            <span>Juros Cartão</span>
+            <span>{paymentMethod === "Cartão de Débito" || paymentMethod === "debit" ? "Taxa Débito" : "Juros Cartão"}</span>
             <span>+{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(creditInterestAmount)}</span>
           </div>
         )}

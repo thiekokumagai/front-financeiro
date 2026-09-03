@@ -58,8 +58,14 @@ export default function EditOrderPage() {
         phone: order.customerPhone,
       });
 
-      setPaymentMethod(order.paymentMethod || "");
-      setIsPaid(order.paymentType === "PAGO");
+      const normMethod =
+        order.paymentMethod === 'pix' || order.paymentMethod === 'PIX' ? 'PIX' :
+        order.paymentMethod === 'credit' || order.paymentMethod === 'Cartão de Crédito' ? 'Cartão de Crédito' :
+        order.paymentMethod === 'debit' || order.paymentMethod === 'Cartão de Débito' ? 'Cartão de Débito' :
+        order.paymentMethod === 'cash' || order.paymentMethod === 'Dinheiro' ? 'Dinheiro' : order.paymentMethod || "";
+
+      setPaymentMethod(normMethod);
+      setIsPaid(order.paymentType === "PAGO" || order.paymentStatus === "PAID");
       setOrderNote(order.observation || "");
       setCustomTotal(order.totalOrder ? order.totalOrder.toFixed(2).replace('.', ',') : "");
       setCreditInstallments(order.installments || 1);
@@ -181,6 +187,7 @@ export default function EditOrderPage() {
         paymentMethod: paymentMethod === 'PIX' ? 'pix' : paymentMethod === 'Cartão de Crédito' ? 'credit' : paymentMethod === 'Cartão de Débito' ? 'debit' : paymentMethod === 'Dinheiro' ? 'cash' : paymentMethod,
         paymentStatus: isPaid ? "PAID" : "PENDING",
         installments: effectiveCreditInstallments,
+        installmentSurcharge: creditInterestAmount > 0 ? Math.round(creditInterestAmount * 100) / 100 : 0,
         amountProvided: amountProvidedVal,
         changeAmount: changeAmountVal,
         observation: orderNote || undefined,
