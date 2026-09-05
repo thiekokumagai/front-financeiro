@@ -163,10 +163,28 @@ export default function DashboardPage() {
       color: "text-emerald-600 bg-emerald-100",
     },
     {
+      label: "Qtd. Total Estoque",
+      value: stats?.quantidadeTotalEstoque || 0,
+      icon: Package,
+      color: "text-indigo-600 bg-indigo-100",
+    },
+    {
+      label: "Custo Prod. Ativos",
+      value: `R$ ${(stats?.valorCustoProdutos || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+      icon: DollarSign,
+      color: "text-emerald-600 bg-emerald-100",
+    },
+    {
       label: "Produtos Inativos",
-      value: stats ? stats.produtosInativos : 0,
+      value: stats?.produtosInativos || 0,
       icon: XCircle,
       color: "text-slate-600 bg-slate-200",
+    },
+    {
+      label: "Venda Total Estoque",
+      value: `R$ ${(stats?.valorVendaTotalProdutos || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+      icon: DollarSign,
+      color: "text-primary bg-primary/10",
     },
   ];
 
@@ -273,7 +291,7 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
         {inventoryCards.map((card, idx) => {
           const IconComponent = card.icon;
           return (

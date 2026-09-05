@@ -94,7 +94,7 @@ export function ProductStockManager({
 
               <div className="space-y-2">
                 <Label>Estoque</Label>
-                <Input
+                <Input inputMode="numeric"
                   type="number"
                   min="0"
                   value={stockInput}

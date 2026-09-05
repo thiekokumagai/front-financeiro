@@ -38,7 +38,7 @@ export default function PaymentsPage() {
           </div>
           <div>
             <Label>Chave PIX</Label>
-            <Input value={pixKey} onChange={(e) => setPixKey(e.target.value)} placeholder="E-mail, CPF, CNPJ ou chave aleatória" />
+            <Input inputMode="numeric" value={pixKey} onChange={(e) => setPixKey(e.target.value)} placeholder="E-mail, CPF, CNPJ ou chave aleatória" />
           </div>
         </CardContent>
       </Card>
@@ -69,10 +69,10 @@ export default function PaymentsPage() {
               ))}
               <TableRow>
                 <TableCell>
-                  <Input type="number" placeholder="Nº" value={newParcelas} onChange={(e) => setNewParcelas(e.target.value)} className="w-20" />
+                  <Input inputMode="numeric" type="number" placeholder="Nº" value={newParcelas} onChange={(e) => setNewParcelas(e.target.value)} className="w-20" />
                 </TableCell>
                 <TableCell>
-                  <Input type="number" step="0.1" placeholder="%" value={newJuros} onChange={(e) => setNewJuros(e.target.value)} className="w-20" />
+                  <Input inputMode="numeric" type="number" step="0.1" placeholder="%" value={newJuros} onChange={(e) => setNewJuros(e.target.value)} className="w-20" />
                 </TableCell>
                 <TableCell>
                   <Button size="icon" variant="ghost" onClick={handleAdd}><Plus className="h-4 w-4" /></Button>

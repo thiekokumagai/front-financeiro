@@ -170,7 +170,7 @@ export function generateCashRegisterPDF(data: CashRegisterPDFData): void {
       formatCurrency(outflows),
     ],
     [
-      { content: "Gasto Motoboy:", styles: { fontStyle: "bold" } },
+      { content: "Frete:", styles: { fontStyle: "bold" } },
       formatCurrency(motoboy),
       { content: "Marketing / Publicidade:", styles: { fontStyle: "bold" } },
       formatCurrency(marketing),

@@ -133,7 +133,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="title" className="text-slate-700 font-bold">Código do Cupom</Label>
-                <Input 
+                <Input inputMode="numeric" 
                   id="title" 
                   placeholder="EX: BEMVINDO10" 
                   value={title}
@@ -161,7 +161,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
                 {type === "VALUE" ? (
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                    <Input 
+                    <Input inputMode="numeric" 
                       id="value" 
                       placeholder="0,00" 
                       value={value !== "" ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value)) : ""}
@@ -173,7 +173,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
                     />
                   </div>
                 ) : (
-                  <Input 
+                  <Input inputMode="numeric" 
                     id="value" 
                     type="number" 
                     step="0.01"
@@ -190,7 +190,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
                 <Label htmlFor="minOrderValue" className="text-slate-700 font-bold">Valor Mínimo do Pedido</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                  <Input 
+                  <Input inputMode="numeric" 
                     id="minOrderValue" 
                     placeholder="Deixe em branco se não houver" 
                     value={minOrderValue !== "" ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(minOrderValue)) : ""}
@@ -205,7 +205,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
 
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="validUntilDate" className="text-slate-700 font-bold">Data de Validade</Label>
-                <Input 
+                <Input inputMode="numeric" 
                   id="validUntilDate" 
                   type="date" 
                   value={validUntilDate}
@@ -216,7 +216,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
 
               <div className="space-y-2">
                 <Label htmlFor="startTime" className="text-slate-700 font-bold">Hora Inicial</Label>
-                <Input 
+                <Input inputMode="numeric" 
                   id="startTime" 
                   type="time" 
                   value={startTime}
@@ -227,7 +227,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
 
               <div className="space-y-2">
                 <Label htmlFor="endTime" className="text-slate-700 font-bold">Hora Final</Label>
-                <Input 
+                <Input inputMode="numeric" 
                   id="endTime" 
                   type="time" 
                   value={endTime}
@@ -238,7 +238,7 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
 
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="maxUses" className="text-slate-700 font-bold">Nº Máximo de Usos</Label>
-                <Input 
+                <Input inputMode="numeric" 
                   id="maxUses" 
                   type="number" 
                   placeholder="Deixe em branco se não houver limite" 

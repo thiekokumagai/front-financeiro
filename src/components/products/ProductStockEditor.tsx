@@ -115,7 +115,7 @@ export function ProductStockEditor({
                     </span>
                   </div>
                 ) : null}
-                <Input
+                <Input inputMode="numeric"
                   type="number"
                   min="0"
                   value={directStockValue}
@@ -175,7 +175,7 @@ export function ProductStockEditor({
 
                   <div>
                     <p className="mb-2 text-sm font-medium">Quantidade</p>
-                    <Input
+                    <Input inputMode="numeric"
                       type="number"
                       min="0"
                       value={rawValue}

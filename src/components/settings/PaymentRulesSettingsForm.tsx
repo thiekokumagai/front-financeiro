@@ -259,9 +259,8 @@ export function PaymentRulesSettingsForm() {
                       {rule.paymentMethod === "credit" ? "Juros (%)" : "Valor (%)"}
                     </Label>
                     <div className="relative">
-                      <Input
+                      <Input inputMode="numeric"
                         type="text"
-                        inputMode="numeric"
                         value={formatPercentVal(rule.value)}
                         onChange={(e) => handlePercentChange(rule.id, e.target.value)}
                         className="h-9 pr-6 font-semibold"
@@ -278,7 +277,7 @@ export function PaymentRulesSettingsForm() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 w-1/2">
                           <span className="text-[10px] text-muted-foreground font-semibold">De</span>
-                          <Input
+                          <Input inputMode="numeric"
                             type="number"
                             min="1"
                             placeholder="De"
@@ -289,7 +288,7 @@ export function PaymentRulesSettingsForm() {
                         </div>
                         <div className="flex items-center gap-1 w-1/2">
                           <span className="text-[10px] text-muted-foreground font-semibold">Até</span>
-                          <Input
+                          <Input inputMode="numeric"
                             type="number"
                             min="1"
                             placeholder="Até"

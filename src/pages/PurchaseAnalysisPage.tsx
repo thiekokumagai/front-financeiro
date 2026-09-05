@@ -124,7 +124,7 @@ export default function PurchaseAnalysisPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="meses">Meses de Histórico (Vendas)</Label>
-                <Input
+                <Input inputMode="numeric"
                   id="meses"
                   type="number"
                   min="1"
@@ -135,7 +135,7 @@ export default function PurchaseAnalysisPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="dias_cobertura">Dias de Cobertura (Estoque)</Label>
-                <Input
+                <Input inputMode="numeric"
                   id="dias_cobertura"
                   type="number"
                   min="1"

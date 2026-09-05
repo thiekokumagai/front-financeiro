@@ -251,7 +251,7 @@ export default function ProductDetailsPage() {
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="title" className="text-sm font-medium">Nome do produto *</Label>
-                  <Input
+                  <Input inputMode="decimal"
                     id="title"
                     placeholder="Ex: Produto X"
                     className="h-10 rounded-xl"
@@ -303,7 +303,7 @@ export default function ProductDetailsPage() {
                       <Label htmlFor="price" className="text-sm font-medium">Preço de venda (R$)</Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                        <Input
+                        <Input inputMode="decimal"
                           id="price"
                           type="text"
                           placeholder="0,00"
@@ -331,7 +331,7 @@ export default function ProductDetailsPage() {
                       <Label htmlFor="costPrice" className="text-sm font-medium">Preço de custo (R$)</Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                        <Input
+                        <Input inputMode="decimal"
                           id="costPrice"
                           type="text"
                           placeholder="0,00"
@@ -438,7 +438,7 @@ export default function ProductDetailsPage() {
                             {currentStock}
                           </span>
                         </div>
-                        <Input
+                        <Input inputMode="numeric"
                           type="number"
                           min="0"
                           value={stockAdjQuantity}

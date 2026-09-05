@@ -63,7 +63,7 @@ export function ProductDetailsForm({
                   <FormItem>
                     <FormLabel>Título</FormLabel>
                     <FormControl>
-                      <Input className="h-12 rounded-2xl bg-background" placeholder="Nome do produto" {...field} />
+                      <Input inputMode="decimal" className="h-12 rounded-2xl bg-background" placeholder="Nome do produto" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -81,7 +81,7 @@ export function ProductDetailsForm({
                     <FormControl>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
-                        <Input
+                        <Input inputMode="decimal"
                           className="h-12 rounded-2xl bg-background pl-9"
                           placeholder="0,00"
                           value={field.value !== undefined && field.value !== null && !isNaN(Number(field.value)) ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value)) : ""}

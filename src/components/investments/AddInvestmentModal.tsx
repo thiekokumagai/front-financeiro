@@ -47,7 +47,7 @@ export function AddInvestmentModal({ isOpen, onClose, cashRegisterId }: Props) {
             <Label htmlFor="amount">Valor (R$)</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-              <Input
+              <Input inputMode="decimal"
                 id="amount"
                 value={amount !== "" ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(amount)) : ""}
                 onChange={(e) => {

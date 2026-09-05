@@ -177,7 +177,7 @@ export function DeliverySettingsForm() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
             <div className="space-y-2">
               <Label className="font-medium text-xs">CEP de Origem</Label>
-              <Input
+              <Input inputMode="numeric"
                 value={originCep}
                 onChange={handleCEPChange}
                 placeholder="00000-000"
@@ -186,7 +186,7 @@ export function DeliverySettingsForm() {
             </div>
             <div className="space-y-2">
               <Label className="font-medium text-xs">Número do Endereço</Label>
-              <Input
+              <Input inputMode="numeric"
                 value={originNumber}
                 onChange={(e) => setOriginNumber(e.target.value)}
                 placeholder="Ex: 123"
@@ -249,7 +249,7 @@ export function DeliverySettingsForm() {
                 <TableRow className="bg-muted/10 border-t-2">
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Input
+                      <Input inputMode="numeric"
                         type="number"
                         placeholder="Ex: 5"
                         value={newDist}
