@@ -405,7 +405,8 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
                   (summary.totalGross || summary.totalReceived) - 
                   (summary.totalProductCost || 0) - 
                   (summary.totalCardFees || 0) - 
-                  ((summary.totalOutflows || 0))
+                  ((summary.totalOutflows || 0) - (summary.totalInvestment || 0)) -
+                  Math.max(0, (summary.totalInvestment || 0) - (summary.totalProductCost || 0))
                 )}
               </p>
             </CardContent>
