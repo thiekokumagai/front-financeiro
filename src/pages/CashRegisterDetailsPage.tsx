@@ -394,6 +394,22 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
               </p>
             </CardContent>
           </Card>
+
+          <Card className="border-pink-100 bg-pink-50/10 rounded-2xl shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs uppercase tracking-wider text-pink-800 font-bold">Lucro Líquido</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-black text-pink-600">
+                {currencyFormatter.format(
+                  (summary.totalGross || summary.totalReceived) - 
+                  (summary.totalProductCost || 0) - 
+                  (summary.totalCardFees || 0) - 
+                  ((summary.totalOutflows || 0))
+                )}
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
