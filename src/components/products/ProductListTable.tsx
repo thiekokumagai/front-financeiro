@@ -463,19 +463,24 @@ export function ProductListTable({
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 mt-2 bg-muted/30 p-2 rounded-lg" onClick={(e) => e.stopPropagation()}>
+              <div className="grid grid-cols-2 gap-2 mt-2 bg-muted/30 p-3 rounded-xl" onClick={(e) => e.stopPropagation()}>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-muted-foreground font-semibold">Preço Venda</span>
+                  <span className="text-[10px] text-muted-foreground font-semibold mb-1">Preço Venda</span>
                   <InlinePriceInput value={product.price} onSave={async (newPrice) => { if (onUpdateProduct) await onUpdateProduct(product.id, { price: newPrice }); }} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-muted-foreground font-semibold">Estoque</span>
-                  {onUpdateStock ? (
-                    <InlineStockEditor stock={product.stock} onAdd={() => onUpdateStock(product.id, 'ADD', 1)} onSub={() => onUpdateStock(product.id, 'SUBTRACT', 1)} />
-                  ) : (
-                    <span className="font-semibold text-foreground text-sm">{product.stock}</span>
-                  )}
+                  <span className="text-[10px] text-muted-foreground font-semibold mb-1">Preço Custo</span>
+                  <InlinePriceInput value={product.costPrice} onSave={async (newCost) => { if (onUpdateProduct) await onUpdateProduct(product.id, { costPrice: newCost }); }} />
                 </div>
+              </div>
+              
+              <div className="mt-1" onClick={(e) => e.stopPropagation()}>
+                <span className="text-[10px] text-muted-foreground font-semibold block mb-1">Estoque</span>
+                {onUpdateStock ? (
+                  <InlineStockEditor stock={product.stock} onAdd={() => onUpdateStock(product.id, 'ADD', 1)} onSub={() => onUpdateStock(product.id, 'SUBTRACT', 1)} />
+                ) : (
+                  <span className="font-semibold text-foreground text-sm">{product.stock}</span>
+                )}
               </div>
             </div>
           ))
