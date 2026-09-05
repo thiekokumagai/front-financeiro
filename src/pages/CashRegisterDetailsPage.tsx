@@ -42,7 +42,7 @@ const CategoryBadge = ({ category, description, className = "" }: { category: st
   const desc = description?.toLowerCase() || "";
   
   if (cat === "MOTOBOY") {
-    return <span className={`inline-flex items-center rounded-md bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold text-orange-700 ring-1 ring-inset ring-orange-600/20 ${className}`}>Motoboy</span>;
+    return <span className={`inline-flex items-center rounded-md bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold text-orange-700 ring-1 ring-inset ring-orange-600/20 ${className}`}>Frete</span>;
   }
   if (cat === "INVESTMENT" || desc.includes("investimento")) {
     return <span className={`inline-flex items-center rounded-md bg-sky-50 px-1.5 py-0.5 text-[10px] font-bold text-sky-700 ring-1 ring-inset ring-sky-600/20 ${className}`}>Investimento</span>;
@@ -232,6 +232,13 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
 
   const ticketMedioHoje = ordersToday.length > 0 ? (totalVendasDia / ordersToday.length) : 0;
   
+  const totalVendasCaixa = orders.reduce((acc: number, order: any) => acc + (order.totalReceived || 0), 0);
+  const produtosVendidosCaixa = orders.reduce((acc: number, order: any) => {
+    const itemsQty = order.items?.reduce((itemAcc: number, item: any) => itemAcc + (item.quantity || 0), 0) || 0;
+    return acc + itemsQty;
+  }, 0);
+  const ticketMedioCaixa = orders.length > 0 ? (totalVendasCaixa / orders.length) : 0;
+  
   const totalsByMethodToday = ordersToday.reduce((acc: Record<string, number>, order: any) => {
     const method = order.paymentMethod || 'Outros';
     acc[method] = (acc[method] || 0) + (order.totalReceived || 0);
@@ -288,7 +295,7 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
       {/* Grupo 1: Fluxo de Caixa (Financeiro) */}
       <div className="space-y-3">
         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Fluxo de Caixa & Saldos</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <Card className="border-emerald-100 bg-emerald-50/10 rounded-2xl shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs uppercase tracking-wider text-emerald-800 font-bold">Faturamento Bruto</CardTitle>
@@ -346,11 +353,22 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
 
           <Card className="border-orange-100 bg-orange-50/10 rounded-2xl shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-orange-800 font-bold">Gasto Motoboy</CardTitle>
+              <CardTitle className="text-xs uppercase tracking-wider text-orange-800 font-bold">Frete</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-black text-orange-600">
                 {currencyFormatter.format(summary.motoboyOutflows || 0)}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-sky-100 bg-sky-50/30 rounded-2xl shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs uppercase tracking-wider text-sky-700 font-bold">Investimentos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-sky-800">
+                {currencyFormatter.format(summary.totalInvestment || 0)}
               </p>
             </CardContent>
           </Card>
@@ -432,6 +450,44 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Itens Vendidos Hoje</p>
                 <p className="text-2xl font-black text-slate-800">{produtosVendidosDia}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 bg-sky-50/30 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 rounded-xl text-sky-700 bg-sky-100">
+                <ShoppingBag className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Pedidos Totais (Caixa)</p>
+                <p className="text-2xl font-black text-slate-800">{orders.length}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 bg-teal-50/30 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 rounded-xl text-teal-700 bg-teal-100">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Ticket Médio (Caixa)</p>
+                <p className="text-2xl font-black text-slate-800">
+                  {currencyFormatter.format(ticketMedioCaixa)}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 bg-amber-50/30 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 rounded-xl text-amber-700 bg-amber-100">
+                <Package className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Itens Vendidos (Caixa)</p>
+                <p className="text-2xl font-black text-slate-800">{produtosVendidosCaixa}</p>
               </div>
             </CardContent>
           </Card>
@@ -772,10 +828,10 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="GENERAL">Geral</SelectItem>
-                    <SelectItem value="MOTOBOY">Motoboy / Frete</SelectItem>
+                    <SelectItem value="MOTOBOY">Frete</SelectItem>
                     <SelectItem value="FIXED_COSTS">Contas Fixas / Despesas Manuais</SelectItem>
                     <SelectItem value="PARTNERS">Pró-Labore / Sócios</SelectItem>
-                    <SelectItem value="INVESTMENT">Transferência p/ Investimento</SelectItem>
+                    <SelectItem value="INVESTMENT">Investimento</SelectItem>
                     <SelectItem value="BANK">Banco</SelectItem>
                   </SelectContent>
                 </Select>
@@ -786,7 +842,7 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
               <Label htmlFor="tx-amount" className="font-semibold text-gray-700">Valor</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                <Input
+                <Input inputMode="decimal"
                   id="tx-amount"
                   value={txAmount !== "" ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(txAmount)) : ""}
                   onChange={(e) => {
