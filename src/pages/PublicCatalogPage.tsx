@@ -58,7 +58,37 @@ export default function PublicCatalogPage() {
 
   useEffect(() => {
     if (settings?.storeName) {
-      document.title = `${settings.storeName} | Catálogo de Produtos`;
+      const storeName = settings.storeName;
+      const titleText = `${storeName} | Catálogo de Produtos`;
+      const descText = settings.topHeaderText || `Confira o catálogo de produtos da ${storeName}. Faça seu pedido online!`;
+      
+      const rawLogo = settings.whiteLogoUrl || settings.logoUrl;
+      const relativeLogoUrl = rawLogo ? buildImageUrl(rawLogo) : "/favicon-192x192.png";
+      const fullLogoUrl = relativeLogoUrl.startsWith("http")
+        ? relativeLogoUrl
+        : `${window.location.origin}${relativeLogoUrl.startsWith("/") ? "" : "/"}${relativeLogoUrl}`;
+
+      // 1. Page Title
+      document.title = titleText;
+
+      // 2. Helper to set/update meta tag
+      const updateMetaTag = (selector: string, attrName: string, attrVal: string, contentVal: string) => {
+        let el = document.querySelector(selector);
+        if (!el) {
+          el = document.createElement("meta");
+          el.setAttribute(attrName, attrVal);
+          document.head.appendChild(el);
+        }
+        el.setAttribute("content", contentVal);
+      };
+
+      updateMetaTag('meta[name="description"]', "name", "description", descText);
+      updateMetaTag('meta[property="og:title"]', "property", "og:title", storeName);
+      updateMetaTag('meta[name="twitter:title"]', "name", "twitter:title", storeName);
+      updateMetaTag('meta[property="og:description"]', "property", "og:description", descText);
+      updateMetaTag('meta[name="twitter:description"]', "name", "twitter:description", descText);
+      updateMetaTag('meta[property="og:image"]', "property", "og:image", fullLogoUrl);
+      updateMetaTag('meta[name="twitter:image"]', "name", "twitter:image", fullLogoUrl);
     }
   }, [settings]);
 
@@ -322,7 +352,7 @@ export default function PublicCatalogPage() {
 
       {/* Floating Bottom Contact Bar */}
       {settings?.phone && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-t from-black via-slate-950/95 to-transparent backdrop-blur-md">
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-10 bg-gradient-to-t from-black via-slate-950/95 to-transparent backdrop-blur-md">
           <div className="max-w-md mx-auto">
             <button
               onClick={handleShareWhatsApp}
