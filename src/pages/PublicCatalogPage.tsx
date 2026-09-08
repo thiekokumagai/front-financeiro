@@ -344,7 +344,7 @@ export default function PublicCatalogPage() {
         <button
           onClick={scrollToTop}
           aria-label="Voltar ao topo"
-          className="fixed bottom-20 right-4 z-40 p-3.5 rounded-full bg-zinc-900/90 hover:bg-amber-400 text-amber-400 hover:text-zinc-950 border border-amber-400/40 shadow-2xl backdrop-blur-md transition-all duration-300 active:scale-90 group flex items-center justify-center"
+          className="fixed bottom-24 right-4 z-40 p-3.5 rounded-full bg-zinc-900/90 hover:bg-amber-400 text-amber-400 hover:text-zinc-950 border border-amber-400/40 shadow-2xl backdrop-blur-md transition-all duration-300 active:scale-90 group flex items-center justify-center"
         >
           <ArrowUp className="h-5 w-5 group-hover:-translate-y-0.5 transition-transform" />
         </button>
@@ -352,7 +352,7 @@ export default function PublicCatalogPage() {
 
       {/* Floating Bottom Contact Bar */}
       {settings?.phone && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-10 bg-gradient-to-t from-black via-slate-950/95 to-transparent backdrop-blur-md">
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-8 bg-gradient-to-t from-black via-slate-950/95 to-transparent backdrop-blur-md">
           <div className="max-w-md mx-auto">
             <button
               onClick={handleShareWhatsApp}
