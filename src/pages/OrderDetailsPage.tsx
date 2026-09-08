@@ -87,12 +87,14 @@ export default function OrderDetailsPage() {
       
       order.items.forEach((item, index) => {
         const product = products[index];
-        if (!product || !(product.isVisible ?? true)) {
+        if (!product || product.status === "inactive" || product.isVisible === false) {
           hasOutOfStock = true;
           return;
         }
         
-        const availableStock = product.stock || 0;
+        const availableStock = product.stock !== undefined && product.stock !== null
+          ? Number(product.stock)
+          : (Number(product.totalStock) || 0);
         if (availableStock <= 0) {
           hasOutOfStock = true;
           return;
@@ -319,49 +321,71 @@ export default function OrderDetailsPage() {
           </div>
 
           {/* Financial summary */}
-          <div className="bg-white rounded-xl border border-slate-200/60 p-6 shadow-sm space-y-3 text-sm font-medium">
-            <h3 className="text-sm uppercase tracking-wider text-slate-400 font-bold">Resumo Financeiro</h3>
-            <div className="space-y-2.5 pt-1">
-              <div className="flex justify-between text-slate-500">
-                <span>Total dos itens ({(order.items || []).length})</span>
-                <span>R$ {Number(order.itemsTotal || 0).toFixed(2)}</span>
+          {(() => {
+            const baseItemsTotal = Number(order.itemsTotal || 0);
+            const baseFreight = Number(order.freight || 0);
+            const rawCouponDiscount = Number(order.couponDiscount || 0);
+            const rawPaymentDiscount = Number(order.paymentDiscount || 0);
+            const rawInstallmentSurcharge = Number(order.installmentSurcharge || 0);
+            let displayReceiptDiscount = Number(order.receiptDiscount || 0);
+            let displayReceiptSurcharge = Number(order.receiptSurcharge || 0);
+
+            if (!displayReceiptDiscount && !displayReceiptSurcharge && order.totalOrder !== undefined) {
+              const expectedBase = Math.round((baseItemsTotal + baseFreight + rawInstallmentSurcharge - rawCouponDiscount - rawPaymentDiscount) * 100) / 100;
+              const diff = Math.round((Number(order.totalOrder) - expectedBase) * 100) / 100;
+              if (diff < 0) {
+                displayReceiptDiscount = Math.abs(diff);
+              } else if (diff > 0) {
+                displayReceiptSurcharge = diff;
+              }
+            }
+
+            return (
+              <div className="bg-white rounded-xl border border-slate-200/60 p-6 shadow-sm space-y-3 text-sm font-medium">
+                <h3 className="text-sm uppercase tracking-wider text-slate-400 font-bold">Resumo Financeiro</h3>
+                <div className="space-y-2.5 pt-1">
+                  <div className="flex justify-between text-slate-500">
+                    <span>Total dos itens ({(order.items || []).length})</span>
+                    <span>R$ {baseItemsTotal.toFixed(2)}</span>
+                  </div>
+                  {rawCouponDiscount > 0 ? (
+                    <div className="flex justify-between text-rose-600">
+                      <span>Desconto Cupom</span>
+                      <span>-R$ {rawCouponDiscount.toFixed(2)}</span>
+                    </div>
+                  ) : null}
+                  {rawPaymentDiscount > 0 ? (
+                    <div className="flex justify-between text-rose-600">
+                      <span>Desconto Pagamento</span>
+                      <span>-R$ {rawPaymentDiscount.toFixed(2)}</span>
+                    </div>
+                  ) : null}
+                  {displayReceiptDiscount > 0 ? (
+                    <div className="flex justify-between text-rose-600">
+                      <span>Desconto Recebimento</span>
+                      <span>-R$ {displayReceiptDiscount.toFixed(2)}</span>
+                    </div>
+                  ) : null}
+                  {rawInstallmentSurcharge > 0 ? (
+                    <div className="flex justify-between text-slate-500">
+                      <span>{order.paymentMethod === 'debit' || order.paymentMethod === 'Cartão de Débito' ? 'Taxa Débito' : 'Acréscimo / Juros Cartão'}</span>
+                      <span>+R$ {rawInstallmentSurcharge.toFixed(2)}</span>
+                    </div>
+                  ) : null}
+                  {displayReceiptSurcharge > 0 ? (
+                    <div className="flex justify-between text-slate-500">
+                      <span>Acréscimo Recebimento</span>
+                      <span>+R$ {displayReceiptSurcharge.toFixed(2)}</span>
+                    </div>
+                  ) : null}
+                  <div className="flex justify-between font-bold text-slate-800 border-t border-slate-100 pt-3 text-base">
+                    <span>Total do pedido</span>
+                    <span>R$ {Number(order.totalOrder || 0).toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
-              {Number(order.couponDiscount || 0) > 0 ? (
-                <div className="flex justify-between text-rose-600">
-                  <span>Desconto Cupom</span>
-                  <span>-R$ {Number(order.couponDiscount).toFixed(2)}</span>
-                </div>
-              ) : null}
-              {Number(order.paymentDiscount || 0) > 0 ? (
-                <div className="flex justify-between text-rose-600">
-                  <span>Desconto Pagamento</span>
-                  <span>-R$ {Number(order.paymentDiscount).toFixed(2)}</span>
-                </div>
-              ) : null}
-              {Number(order.receiptDiscount || 0) > 0 ? (
-                <div className="flex justify-between text-rose-600">
-                  <span>Desconto Recebimento</span>
-                  <span>-R$ {Number(order.receiptDiscount).toFixed(2)}</span>
-                </div>
-              ) : null}
-              {Number(order.installmentSurcharge || 0) > 0 ? (
-                <div className="flex justify-between text-slate-500">
-                  <span>{order.paymentMethod === 'debit' || order.paymentMethod === 'Cartão de Débito' ? 'Taxa Débito' : 'Acréscimo / Juros Cartão'}</span>
-                  <span>+R$ {Number(order.installmentSurcharge).toFixed(2)}</span>
-                </div>
-              ) : null}
-              {Number(order.receiptSurcharge || 0) > 0 ? (
-                <div className="flex justify-between text-slate-500">
-                  <span>Acréscimo Recebimento</span>
-                  <span>+R$ {Number(order.receiptSurcharge).toFixed(2)}</span>
-                </div>
-              ) : null}
-              <div className="flex justify-between font-bold text-slate-800 border-t border-slate-100 pt-3 text-base">
-                <span>Total do pedido</span>
-                <span>R$ {Number(order.totalOrder || 0).toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Footer Action */}
           {order.status !== "CANCELLED" && order.status !== "COMPLETED" ? (

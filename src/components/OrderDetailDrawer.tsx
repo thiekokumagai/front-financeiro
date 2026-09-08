@@ -96,51 +96,36 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
 
       const isCurrentlyPaid = order.paymentStatus === "PAID" || order.status === "CANCELLED";
 
-      if (isCurrentlyPaid) {
-        setCouponDiscount((order.couponDiscount || 0) + (order.couponFreightDiscount || 0));
-        setManualDiscount(order.receiptDiscount || 0);
-        setPixDiscount(order.paymentDiscount || 0);
-        setSurcharge(order.receiptSurcharge || 0);
-        setCardSurcharge(order.installmentSurcharge || 0);
-        setTotalReceived(order.totalReceived > 0 ? order.totalReceived : (order.totalOrder || 0));
-      } else {
-        let initialDiscount = (order.couponDiscount || 0) + (order.couponFreightDiscount || 0);
-        
-        if (order.coupon && order.coupon.type === 'FREE_SHIPPING' && initialDiscount === 0) {
-          initialDiscount = order.freight;
-        }
-
-        setCouponDiscount(initialDiscount);
-        setManualDiscount(0);
-        setSurcharge(0);
-        const method = order.paymentMethod || "";
-        const baseTotal = order.itemsTotal + order.freight;
-        let initialPixDiscount = order.paymentDiscount || 0;
-        let initialCardSurcharge = order.installmentSurcharge || 0;
-        let inst = order.installments || 1;
-        
-        const totalDiscount = initialDiscount;
-        const amountForFee = baseTotal - totalDiscount;
-        const productDiscount = (order.coupon?.type === 'FREE_SHIPPING') ? 0 : totalDiscount;
-        const baseForPix = Math.max(0, order.itemsTotal - productDiscount);
-
-        const initialCalculated = Math.round((baseTotal + initialCardSurcharge - initialPixDiscount - totalDiscount) * 100) / 100;
-        const diff = Math.round((order.totalOrder - initialCalculated) * 100) / 100;
-        
-        let initialSurcharge = 0;
-        let initialManualDiscount = 0;
-        if (diff > 0) {
-          initialSurcharge = diff;
-        } else if (diff < 0) {
-          initialManualDiscount = Math.abs(diff);
-        }
-
-        setSurcharge(initialSurcharge);
-        setManualDiscount(initialManualDiscount);
-        setPixDiscount(initialPixDiscount);
-        setCardSurcharge(initialCardSurcharge);
-        setTotalReceived(order.totalOrder);
+      const baseTotal = (order.itemsTotal || 0) + (order.freight || 0);
+      let initialDiscount = (order.couponDiscount || 0) + (order.couponFreightDiscount || 0);
+      if (order.coupon && order.coupon.type === 'FREE_SHIPPING' && initialDiscount === 0) {
+        initialDiscount = order.freight || 0;
       }
+      setCouponDiscount(initialDiscount);
+
+      let initialPixDiscount = order.paymentDiscount || 0;
+      let initialCardSurcharge = order.installmentSurcharge || 0;
+      setPixDiscount(initialPixDiscount);
+      setCardSurcharge(initialCardSurcharge);
+
+      let initialManualDiscount = order.receiptDiscount || 0;
+      let initialSurcharge = order.receiptSurcharge || 0;
+
+      const targetTotal = (isCurrentlyPaid && order.totalReceived > 0) ? order.totalReceived : (order.totalOrder || 0);
+      const expectedBase = Math.round((baseTotal + initialCardSurcharge - initialPixDiscount - initialDiscount) * 100) / 100;
+      const diff = Math.round((targetTotal - expectedBase) * 100) / 100;
+
+      if (!initialManualDiscount && !initialSurcharge) {
+        if (diff < 0) {
+          initialManualDiscount = Math.abs(diff);
+        } else if (diff > 0) {
+          initialSurcharge = diff;
+        }
+      }
+
+      setManualDiscount(initialManualDiscount);
+      setSurcharge(initialSurcharge);
+      setTotalReceived(targetTotal > 0 ? targetTotal : expectedBase);
     }
   }, [order, settings]);
 
@@ -160,13 +145,14 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
   const handleTotalChange = (newTotal: number) => {
     setTotalReceived(newTotal);
     if (!order) return;
-    const baseTotal = order.itemsTotal + order.freight;
-    const baseCalculated = baseTotal - couponDiscount - pixDiscount + cardSurcharge;
-    if (newTotal > baseCalculated) {
-      setSurcharge(newTotal - baseCalculated);
+    const baseTotal = (order.itemsTotal || 0) + (order.freight || 0);
+    const baseCalculated = Math.round((baseTotal - couponDiscount - pixDiscount + cardSurcharge) * 100) / 100;
+    const diff = Math.round((newTotal - baseCalculated) * 100) / 100;
+    if (diff > 0) {
+      setSurcharge(diff);
       setManualDiscount(0);
-    } else if (newTotal < baseCalculated) {
-      setManualDiscount(baseCalculated - newTotal);
+    } else if (diff < 0) {
+      setManualDiscount(Math.abs(diff));
       setSurcharge(0);
     } else {
       setManualDiscount(0);
@@ -423,9 +409,11 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
         let availableStock = 0;
         if (item.productItemId) {
           const pItem = product.items?.find((i: any) => i.id === item.productItemId);
-          if (pItem) availableStock = pItem.stock || 0;
+          if (pItem) availableStock = Number(pItem.stock) || 0;
         } else {
-          availableStock = product.totalStock || 0;
+          availableStock = product.stock !== undefined && product.stock !== null
+            ? Number(product.stock)
+            : (Number(product.totalStock) || 0);
         }
 
         if (availableStock <= 0) {
@@ -802,7 +790,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                 </div>
                 <div className="flex justify-between font-bold text-slate-800 border-t border-slate-100 pt-2.5 items-center">
                   <span>Total final</span>
-                  <span>{formatCurrency(order.totalOrder)}</span>
+                  <span>{formatCurrency(Math.round(((order?.itemsTotal || 0) + (order?.freight || 0) + cardSurcharge + surcharge - couponDiscount - pixDiscount - manualDiscount) * 100) / 100)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-emerald-600 bg-emerald-50/50 p-2 rounded-lg mt-1 items-center">
                   <span>Total recebido</span>

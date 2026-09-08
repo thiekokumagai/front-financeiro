@@ -274,6 +274,16 @@ export default function CreateOrderPage() {
       const amountProvidedVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > 0 ? parsedChangeFor : (isCash ? finalTotal : undefined);
       const changeAmountVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > finalTotal ? Math.round((parsedChangeFor - finalTotal) * 100) / 100 : undefined;
 
+      const expectedTotalBeforeCustom = total;
+      const diff = Math.round((finalTotal - expectedTotalBeforeCustom) * 100) / 100;
+      let calcReceiptDiscount = 0;
+      let calcReceiptSurcharge = 0;
+      if (diff < 0) {
+        calcReceiptDiscount = Math.abs(diff);
+      } else if (diff > 0) {
+        calcReceiptSurcharge = diff;
+      }
+
       const payload = {
         customerName: finalCustomerName,
         customerPhone: finalCustomerPhone,
@@ -285,6 +295,9 @@ export default function CreateOrderPage() {
         paymentStatus: isPaid ? "PAID" : "PENDING",
         installments: effectiveCreditInstallments,
         installmentSurcharge: creditInterestAmount > 0 ? Math.round(creditInterestAmount * 100) / 100 : 0,
+        paymentDiscount: pixDiscountAmount > 0 ? Math.round(pixDiscountAmount * 100) / 100 : 0,
+        receiptDiscount: calcReceiptDiscount,
+        receiptSurcharge: calcReceiptSurcharge,
         amountProvided: amountProvidedVal,
         changeAmount: changeAmountVal,
         observation: orderNote || undefined,
