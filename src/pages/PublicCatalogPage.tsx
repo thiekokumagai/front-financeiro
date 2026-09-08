@@ -148,20 +148,10 @@ export default function PublicCatalogPage() {
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 space-y-6">
         {/* Top Header / Branding */}
         <header className="flex flex-col items-center text-center space-y-3 pt-4 border-b border-zinc-800/80 pb-6">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-yellow-300 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500" />
-            <img
-              src={logoSrc}
-              alt={settings?.storeName || "Logo"}
-              className="relative h-20 w-auto object-contain p-2 bg-black/40 rounded-xl border border-zinc-800"
-            />
-          </div>
+          
 
           <div className="space-y-1">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-amber-400 bg-amber-400/10 px-3.5 py-1 rounded-full border border-amber-400/20">
-              <Sparkles className="h-3 w-3 text-amber-400" />
-              {settings?.storeName ? `Catálogo - ${settings.storeName}` : "Catálogo de Produtos"}
-            </span>
+            
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
               {settings?.storeName || "FINANCEIRO"}
             </h1>
@@ -179,7 +169,7 @@ export default function PublicCatalogPage() {
               className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-amber-400 bg-zinc-900/80 hover:bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full transition-colors"
             >
               {copiedLink ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-              <span>{copiedLink ? "Link Copiado!" : settings?.storeName ? `Copiar Link de ${settings.storeName}` : "Copiar Link do Catálogo"}</span>
+              <span>{copiedLink ? "Link Copiado!" : "Copiar Link do Catálogo"}</span>
             </button>
           </div>
         </header>
@@ -297,12 +287,12 @@ export default function PublicCatalogPage() {
           <div className="max-w-md mx-auto">
             <button
               onClick={handleShareWhatsApp}
-              className="w-full h-13 bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-base rounded-2xl shadow-xl shadow-emerald-950/50 border border-emerald-400/40 flex items-center justify-center gap-3 transition-all active:scale-98"
+              className="w-full h-12 bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-base rounded-full shadow-xl shadow-emerald-950/50 border border-emerald-400/40 flex items-center justify-center gap-3 transition-all active:scale-98"
             >
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 fill-white text-emerald-600" />
               </div>
-              <span>{settings?.storeName ? `Falar no WhatsApp com ${settings.storeName}` : "Falar no WhatsApp com a Loja"}</span>
+              <span>Toque aqui e faça o seu pedido!</span>
             </button>
           </div>
         </div>
