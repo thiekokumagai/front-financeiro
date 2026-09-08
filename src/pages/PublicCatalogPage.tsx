@@ -201,7 +201,7 @@ export default function PublicCatalogPage() {
               placeholder="Buscar produto ou dosagem..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-4 bg-zinc-900/90 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-amber-400/60 transition"
+              className="w-full h-11 pl-10 pr-4 bg-zinc-900/90 border border-zinc-800 rounded-xl text-[16px] text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-amber-400/60 transition"
             />
           </div>
 
