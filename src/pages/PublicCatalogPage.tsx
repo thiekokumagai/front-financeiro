@@ -4,7 +4,7 @@ import { Product } from "@/types/product";
 import { Category } from "@/types/category";
 import { buildImageUrl } from "@/utils/image-url";
 import { openWhatsApp } from "@/utils/whatsapp";
-import { ShoppingCart, MessageCircle, Plus, Minus, Search, Sparkles, Check, Share2, Copy } from "lucide-react";
+import { ShoppingCart, MessageCircle, Plus, Minus, Search, Sparkles, Check, Share2, Copy, ArrowUp } from "lucide-react";
 import { formatCurrency } from "@/utils/formatters";
 import { matchesProductSearch } from "@/utils/search";
 
@@ -17,6 +17,23 @@ export default function PublicCatalogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState<{ [productId: string]: number }>({});
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -279,7 +296,29 @@ export default function PublicCatalogPage() {
             ))}
           </div>
         )}
+
+        {/* Back to Top Footer Button */}
+        <div className="pt-8 pb-4 flex justify-center">
+          <button
+            onClick={scrollToTop}
+            className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-zinc-400 hover:text-amber-400 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 px-5 py-2.5 rounded-full transition-all shadow-lg active:scale-95 group"
+          >
+            <ArrowUp className="h-4 w-4 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
+            <span>Voltar ao topo</span>
+          </button>
+        </div>
       </div>
+
+      {/* Floating Back to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          aria-label="Voltar ao topo"
+          className="fixed bottom-20 right-4 z-40 p-3.5 rounded-full bg-zinc-900/90 hover:bg-amber-400 text-amber-400 hover:text-zinc-950 border border-amber-400/40 shadow-2xl backdrop-blur-md transition-all duration-300 active:scale-90 group flex items-center justify-center"
+        >
+          <ArrowUp className="h-5 w-5 group-hover:-translate-y-0.5 transition-transform" />
+        </button>
+      )}
 
       {/* Floating Bottom Contact Bar */}
       {settings?.phone && (
