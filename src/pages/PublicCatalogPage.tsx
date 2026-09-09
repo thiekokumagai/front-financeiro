@@ -172,20 +172,14 @@ export default function PublicCatalogPage() {
 
   return (
     <div className="min-h-screen bg-[#06090e] text-slate-100 font-sans pb-36 relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
-      {/* Dynamic Fitness & Gym Animated Background Layer (High Energy MotionSites vibe) */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Intense Neon Fitness Energy Orbs */}
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-to-b from-emerald-500/20 via-amber-500/10 to-transparent blur-[150px] rounded-full animate-pulse duration-[4000ms]" />
-        <div className="absolute top-1/4 -left-40 w-96 h-96 bg-emerald-400/15 blur-[130px] rounded-full animate-bounce duration-[8000ms]" />
-        <div className="absolute bottom-1/3 -right-40 w-[450px] h-[450px] bg-amber-400/10 blur-[150px] rounded-full animate-pulse duration-[6000ms]" />
+      {/* Optimized Lightweight Background Layer for Mobile Performance */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#06090e]">
+        {/* Static Soft Ambient Glows (No heavy animated blurs) */}
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -left-32 w-64 h-64 bg-cyan-500/5 rounded-full blur-2xl" />
 
-        {/* Floating Fitness Particle Grid & Geometric Hex / Iron Mesh */}
-        <div className="absolute inset-0 bg-[radial-gradient(#10b98115_1px,transparent_1px)] [background-size:24px_24px] opacity-70" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b9810a_1px,transparent_1px),linear-gradient(to_bottom,#10b9810a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_20%,#000_70%,transparent_100%)]" />
-
-        {/* Ambient Animated Light Rays */}
-        <div className="absolute top-0 left-1/4 w-96 h-screen bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent -rotate-45 blur-2xl pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-96 h-screen bg-gradient-to-b from-amber-500/5 via-transparent to-transparent rotate-45 blur-2xl pointer-events-none" />
+        {/* Lightweight Static Mesh Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98108_1px,transparent_1px),linear-gradient(to_bottom,#10b98108_1px,transparent_1px)] bg-[size:32px_32px]" />
       </div>
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-4 space-y-6">
@@ -201,14 +195,11 @@ export default function PublicCatalogPage() {
             {/* Cinematic Video Overlay Gradients */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 via-transparent to-slate-950/70" />
-            
-            {/* Ambient Scanline / Video Glitch Overlay */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.4)_50%)] bg-[size:100%_4px] opacity-40 pointer-events-none" />
 
             <div className="absolute top-3 right-3 z-10">
               <button
                 onClick={handleCopyLink}
-                className="inline-flex items-center gap-1.5 text-xs text-slate-200 hover:text-emerald-300 bg-slate-950/80 hover:bg-slate-900 border border-slate-700/80 px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-lg backdrop-blur-md"
+                className="inline-flex items-center gap-1.5 text-xs text-slate-200 hover:text-emerald-300 bg-slate-950/90 hover:bg-slate-900 border border-slate-700/80 px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-lg"
               >
                 {copiedLink ? (
                   <Check className="h-3.5 w-3.5 text-emerald-400 animate-in zoom-in" />
@@ -277,7 +268,7 @@ export default function PublicCatalogPage() {
               placeholder="Buscar por medicamento, princípio ativo ou dosagem..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-11 pr-4 bg-slate-900/95 border border-slate-800/90 focus:border-emerald-500/70 rounded-2xl text-[15px] text-slate-100 placeholder:text-slate-500 focus:outline-none transition-all shadow-xl backdrop-blur-xl focus:ring-4 focus:ring-emerald-500/10"
+              className="w-full h-12 pl-11 pr-4 bg-slate-900 border border-slate-800 focus:border-emerald-500/70 rounded-2xl text-[15px] text-slate-100 placeholder:text-slate-500 focus:outline-none transition-all shadow-xl focus:ring-2 focus:ring-emerald-500/20"
             />
             {searchQuery && (
               <button
@@ -356,7 +347,7 @@ export default function PublicCatalogPage() {
                     return (
                       <div
                         key={product.id}
-                        className="group relative flex items-center justify-between gap-3 p-4 rounded-2xl transition-all duration-300 bg-slate-900/70 hover:bg-slate-900/90 border border-slate-800/80 hover:border-emerald-500/40 shadow-md backdrop-blur-xl"
+                        className="group relative flex items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-emerald-500/40 shadow-md"
                       >
                         {/* Product Details */}
                         <div className="min-w-0 flex-1 pl-1">
