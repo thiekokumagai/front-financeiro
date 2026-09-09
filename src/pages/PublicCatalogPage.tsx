@@ -133,6 +133,11 @@ export default function PublicCatalogPage() {
       map.get(catId)?.items.push(prod);
     });
 
+    // Ordenar produtos dentro de cada grupo em ordem alfabética (A-Z)
+    map.forEach((group) => {
+      group.items.sort((a, b) => (a.title || "").localeCompare(b.title || "", "pt-BR", { sensitivity: "base" }));
+    });
+
     return Array.from(map.values()).filter((group) => group.items.length > 0);
   }, [filteredProducts, categories]);
 
