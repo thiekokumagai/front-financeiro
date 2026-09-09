@@ -138,7 +138,7 @@ export default function PublicCatalogPage() {
 
   const handleShareWhatsApp = () => {
     const storeTitle = settings?.storeName || "FARMÁCIA";
-    const message = `Olá! Consultei os medicamentos no catálogo online da *${storeTitle}* e gostaria de solicitar atendimento / tirar dúvidas sobre disponibilidade e pedido.`;
+    const message = `Olá *${storeTitle}*! Gostaria de fazer pedido.`;
 
     openWhatsApp({
       phone: settings?.phone,
