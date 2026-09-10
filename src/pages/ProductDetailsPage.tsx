@@ -251,7 +251,7 @@ export default function ProductDetailsPage() {
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="title" className="text-sm font-medium">Nome do produto *</Label>
-                  <Input inputMode="decimal"
+                  <Input 
                     id="title"
                     placeholder="Ex: Produto X"
                     className="h-10 rounded-xl"
