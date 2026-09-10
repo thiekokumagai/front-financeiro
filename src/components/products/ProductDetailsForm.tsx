@@ -63,7 +63,7 @@ export function ProductDetailsForm({
                   <FormItem>
                     <FormLabel>Título</FormLabel>
                     <FormControl>
-                      <Input inputMode="decimal" className="h-12 rounded-2xl bg-background" placeholder="Nome do produto" {...field} />
+                      <Input className="h-12 rounded-2xl bg-background" placeholder="Nome do produto" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
