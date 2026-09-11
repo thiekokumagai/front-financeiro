@@ -29,6 +29,12 @@ export function AdminLayout() {
   const [renewalWarning, setRenewalWarning] = useState<{ daysLeft: number } | null>(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+    const mainEl = document.querySelector("main");
+    if (mainEl) mainEl.scrollTop = 0;
+  }, [location.pathname]);
+
+  useEffect(() => {
     if (superAdmin) {
       document.title = "Super Admin | Financeiro";
       return;
