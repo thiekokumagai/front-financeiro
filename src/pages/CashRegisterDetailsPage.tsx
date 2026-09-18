@@ -171,6 +171,19 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
 
   const { cashRegister, summary, orders, transactions = [] } = data;
   
+
+  const gross = summary?.totalGross || summary?.totalReceived || 0;
+  const totalNetProfit = summary?.totalNetProfit !== undefined
+    ? summary.totalNetProfit
+    : gross - 
+      (summary?.totalProductCost || 0) - 
+      (summary?.totalCardFees || 0) - 
+      (summary?.totalOutflows || 0) -
+      (summary?.motoboyOutflows || 0) -
+      (summary?.marketingOutflows || 0) -
+      Math.max(0, (summary?.totalInvestment || 0) - (summary?.totalProductCost || 0));
+
+  const netProfitMargin = gross > 0 ? (totalNetProfit / gross) * 100 : 0;
   // Ocultar a transação de Caixa Inicial da lista, pois ela é editada na tela do próprio Caixa
   const displayTransactions = transactions.filter((tx: any) => !(tx.description === 'Caixa Inicial' && tx.category === 'Banco'));
 
@@ -395,19 +408,25 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
             </CardContent>
           </Card>
 
-          <Card className="border-pink-100 bg-pink-50/10 rounded-2xl shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-pink-800 font-bold">Lucro Líquido</CardTitle>
+          <Card className="border-emerald-200 bg-emerald-50/20 rounded-2xl shadow-sm">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+              <CardTitle className="text-xs uppercase tracking-wider text-emerald-800 font-bold">Lucro Líquido</CardTitle>
+              <span className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
+                totalNetProfit >= 0
+                  ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                  : "bg-rose-100 text-rose-800 border border-rose-300"
+              }`}>
+                {netProfitMargin.toFixed(1)}%
+              </span>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-black text-pink-600">
-                {currencyFormatter.format(
-                  (summary.totalGross || summary.totalReceived) - 
-                  (summary.totalProductCost || 0) - 
-                  (summary.totalCardFees || 0) - 
-                  (summary.totalOutflows || 0) -
-                  Math.max(0, (summary.totalInvestment || 0) - (summary.totalProductCost || 0))
-                )}
+              <div className="flex items-baseline justify-between gap-2">
+                <p className={`text-2xl font-black ${totalNetProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                  {currencyFormatter.format(totalNetProfit)}
+                </p>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1 font-medium hidden sm:block">
+                Margem: <span className="font-bold text-slate-700">{netProfitMargin.toFixed(1)}%</span> sobre faturamento
               </p>
             </CardContent>
           </Card>

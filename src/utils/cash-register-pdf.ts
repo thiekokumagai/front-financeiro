@@ -149,6 +149,10 @@ export function generateCashRegisterPDF(data: CashRegisterPDFData): void {
   const net = summary.totalNet !== undefined
     ? parseNumber(summary.totalNet)
     : gross - cardFees - outflows + entries;
+  const investmentDeduction = Math.max(0, investments - productCost);
+  const netProfit = summary.totalNetProfit !== undefined
+    ? parseNumber(summary.totalNetProfit)
+    : gross - cardFees - productCost - outflows - motoboy - marketing - investmentDeduction;
 
   const summaryRows = [
     [
@@ -178,8 +182,14 @@ export function generateCashRegisterPDF(data: CashRegisterPDFData): void {
     [
       { content: "Saída Sócios:", styles: { fontStyle: "bold" } },
       formatCurrency(partners),
-      { content: "Saldo Líquido Final:", styles: { fontStyle: "bold", textColor: [16, 185, 129] } },
-      { content: formatCurrency(net), styles: { fontStyle: "bold", textColor: [16, 185, 129] } },
+      { content: "Saldo Líquido Final:", styles: { fontStyle: "bold", textColor: [124, 58, 237] } },
+      { content: formatCurrency(net), styles: { fontStyle: "bold", textColor: [124, 58, 237] } },
+    ],
+    [
+      "",
+      "",
+      { content: "Lucro Líquido:", styles: { fontStyle: "bold", textColor: [16, 185, 129] } },
+      { content: `${formatCurrency(netProfit)}${gross > 0 ? ` (${((netProfit / gross) * 100).toFixed(1)}%)` : ""}`, styles: { fontStyle: "bold", textColor: [16, 185, 129] } },
     ],
   ];
 
