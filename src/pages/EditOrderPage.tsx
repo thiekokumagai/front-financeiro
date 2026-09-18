@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductSearch } from "@/components/orders/ProductSearch";
 import { CustomerSearch } from "@/components/orders/CustomerSearch";
@@ -267,7 +267,7 @@ export default function EditOrderPage() {
           </div>
 
           {/* Product Selection */}
-          <div className="bg-card rounded-xl border p-5 space-y-4 shadow-sm">
+          <div className="bg-card rounded-xl border p-4 sm:p-5 space-y-4 shadow-sm">
             <h2 className="font-semibold text-base">2. Produtos</h2>
             <ProductSearch onSelectProduct={handleSelectProduct} />
 
@@ -277,11 +277,12 @@ export default function EditOrderPage() {
                 {orderItems.map((item, index) => (
                   <div
                     key={`${item.productId}-${index}`}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border text-sm"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 gap-3 rounded-lg bg-muted/40 border text-sm"
                   >
-                    <div className="flex-1 min-w-0 pr-4">
-                      <p className="font-medium truncate">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-800 text-sm leading-snug break-words">{item.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Unitário:{" "}
                         {new Intl.NumberFormat("pt-BR", {
                           style: "currency",
                           currency: "BRL",
@@ -289,44 +290,49 @@ export default function EditOrderPage() {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() => handleUpdateQuantity(index, -1)}
-                        >
-                          -
-                        </Button>
-                        <span className="w-8 text-center font-semibold">
-                          {item.quantity}
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/50">
+                      <div className="text-left sm:text-right">
+                        <span className="text-[11px] text-muted-foreground block sm:hidden">Total:</span>
+                        <span className="font-bold text-sm text-slate-800">
+                          {new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(item.price * item.quantity)}
                         </span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() => handleUpdateQuantity(index, 1)}
-                        >
-                          +
-                        </Button>
                       </div>
 
-                      <span className="font-bold w-20 text-right">
-                        {new Intl.NumberFormat("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(item.price * item.quantity)}
-                      </span>
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => handleUpdateQuantity(index, -1)}
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </Button>
+                          <span className="w-7 text-center font-semibold text-sm">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => handleUpdateQuantity(index, 1)}
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-destructive hover:text-destructive"
-                        onClick={() => handleRemoveItem(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-md shrink-0 ml-1"
+                          onClick={() => handleRemoveItem(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
