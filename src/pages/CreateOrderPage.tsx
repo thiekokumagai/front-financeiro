@@ -182,7 +182,9 @@ export default function CreateOrderPage() {
   const parsedCustomTotal = parseFloat(customTotal.replace(/\./g, '').replace(',', '.'));
   const finalTotal = !isNaN(parsedCustomTotal) && customTotal.trim() !== "" ? parsedCustomTotal : total;
 
-  const isValid = (isBudgetMode || !!selectedCustomer) && orderItems.length > 0 && paymentMethod !== "" && (paymentMethod !== "Dinheiro" || !needsChange || (changeFor.trim() !== "" && parseFloat(changeFor.replace(/\./g, '').replace(',', '.')) >= finalTotal));
+  const isValid = isBudgetMode
+    ? orderItems.length > 0
+    : !!selectedCustomer && orderItems.length > 0 && paymentMethod !== "" && (paymentMethod !== "Dinheiro" || !needsChange || (changeFor.trim() !== "" && parseFloat(changeFor.replace(/\./g, '').replace(',', '.')) >= finalTotal));
 
   const handleSelectProduct = (product: ProductResponse) => {
     setOrderItems((prev) => {
@@ -242,9 +244,21 @@ export default function CreateOrderPage() {
     if (!isValid || (!isBudgetMode && !selectedCustomer)) return;
     
     if (isBudgetMode) {
+      let itemsText = orderItems
+        .map((i) => `• *${i.quantity}x* ${i.title} - ${formatCurrency(i.price * i.quantity)}`)
+        .join("\n");
+
+      const totalStr = formatCurrency(finalTotal);
+      const text = `📋 *ORÇAMENTO DE COMPRA*\n\n📦 *ITENS:*\n${itemsText}\n\n💰 *Total do Orçamento:* ${totalStr}\n\n_Orçamento válido conforme disponibilidade de estoque._`;
+
+      openWhatsApp({
+        phone: selectedCustomer?.phone || "",
+        text,
+      });
+
       toast({
-        title: "Modo Orçamento",
-        description: "Orçamentos servem apenas para calcular preços e não são salvos.",
+        title: "Orçamento Gerado!",
+        description: "Compartilhamento no WhatsApp iniciado.",
       });
       return;
     }

@@ -214,7 +214,7 @@ export function OrderSummary({
         disabled={!isValid || isSubmitting}
         onClick={onSubmit}
       >
-        {isSubmitting ? "Finalizando..." : (isBudgetMode ? "Orçamento (Não Salva)" : "Finalizar Pedido")}
+        {isSubmitting ? "Finalizando..." : (isBudgetMode ? "Enviar Orçamento" : "Finalizar Pedido")}
       </Button>
     </div>
   );
