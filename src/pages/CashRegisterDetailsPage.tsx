@@ -737,6 +737,36 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
                 </CardContent>
               </Card>
 
+              
+
+              {/* Resumo por Método (Geral) */}
+              <Card className="border-slate-200">
+                <CardHeader className="bg-slate-50/50 border-b py-4">
+                  <CardTitle className="text-base font-bold text-slate-700">Por Método de Venda (Total)</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="space-y-3.5">
+                    {Object.entries(summary.totalsByMethod).map(([method, total]) => (
+                      <div key={method} className="flex justify-between items-center border-b border-slate-100 pb-2.5 last:border-0 last:pb-0">
+                        <span className="text-sm font-semibold text-slate-600">{
+                            (method === 'pix' || method === 'PIX') ? 'Pix' :
+                            (method === 'credito' || method === 'credit' || method === 'Cartão de Crédito') ? 'Cartão de Crédito' :
+                            (method === 'debito' || method === 'debit' || method === 'Cartão de Débito') ? 'Cartão de Débito' :
+                            (method === 'dinheiro' || method === 'cash' || method === 'Dinheiro') ? 'Dinheiro' :
+                            method
+                        }</span>
+                        <span className="font-extrabold text-slate-800">
+                          {currencyFormatter.format(total as number)}
+                        </span>
+                      </div>
+                    ))}
+                    {Object.keys(summary.totalsByMethod).length === 0 && (
+                      <div className="text-center py-4 text-gray-400 text-xs">Sem vendas consolidadas.</div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Resumo por Categoria (Lucro & Margem) */}
               <Card className="border-emerald-100 bg-emerald-50/10">
                 <CardHeader className="bg-emerald-50/50 border-b border-emerald-100 py-4">
@@ -769,34 +799,6 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
                     ))}
                     {categoryStatsList.length === 0 && (
                       <div className="text-center py-4 text-emerald-600/70 text-xs font-medium">Sem vendas de produtos registradas.</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Resumo por Método (Geral) */}
-              <Card className="border-slate-200">
-                <CardHeader className="bg-slate-50/50 border-b py-4">
-                  <CardTitle className="text-base font-bold text-slate-700">Por Método de Venda (Total)</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="space-y-3.5">
-                    {Object.entries(summary.totalsByMethod).map(([method, total]) => (
-                      <div key={method} className="flex justify-between items-center border-b border-slate-100 pb-2.5 last:border-0 last:pb-0">
-                        <span className="text-sm font-semibold text-slate-600">{
-                            (method === 'pix' || method === 'PIX') ? 'Pix' :
-                            (method === 'credito' || method === 'credit' || method === 'Cartão de Crédito') ? 'Cartão de Crédito' :
-                            (method === 'debito' || method === 'debit' || method === 'Cartão de Débito') ? 'Cartão de Débito' :
-                            (method === 'dinheiro' || method === 'cash' || method === 'Dinheiro') ? 'Dinheiro' :
-                            method
-                        }</span>
-                        <span className="font-extrabold text-slate-800">
-                          {currencyFormatter.format(total as number)}
-                        </span>
-                      </div>
-                    ))}
-                    {Object.keys(summary.totalsByMethod).length === 0 && (
-                      <div className="text-center py-4 text-gray-400 text-xs">Sem vendas consolidadas.</div>
                     )}
                   </div>
                 </CardContent>
