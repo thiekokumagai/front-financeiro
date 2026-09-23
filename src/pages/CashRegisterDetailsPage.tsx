@@ -589,9 +589,9 @@ export default function CashRegisterDetailsPage({ currentId }: { currentId?: str
 
       <Tabs defaultValue="pedidos" className="w-full">
         <TabsList className="mb-6 bg-slate-100 p-1 w-full overflow-x-auto flex whitespace-nowrap justify-start md:w-fit md:inline-flex">
-          <TabsTrigger value="pedidos" className="font-semibold">Pedidos Recebidos</TabsTrigger>
-          <TabsTrigger value="categorias" className="font-semibold">Lucro por Categoria</TabsTrigger>
+          <TabsTrigger value="pedidos" className="font-semibold">Pedidos Recebidos</TabsTrigger>          
           <TabsTrigger value="movimentacoes" className="font-semibold">Movimentações Manuais</TabsTrigger>
+          <TabsTrigger value="categorias" className="font-semibold">Lucro por Categoria</TabsTrigger>    
         </TabsList>
 
         <TabsContent value="pedidos" className="animate-in fade-in duration-300 focus-visible:outline-none focus-visible:ring-0">
