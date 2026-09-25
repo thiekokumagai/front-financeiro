@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { io } from "socket.io-client";
 import {
   getPublicStoreSettings,
   getPublicStoreCategories,
   getPublicStoreProducts,
-  getCachedStoreCatalog,
   PublicStoreSettings,
 } from "@/services/store-catalog.service";
 import { Product } from "@/types/product";
@@ -28,13 +28,46 @@ import { formatCurrency } from "@/utils/formatters";
 import { matchesProductSearch } from "@/utils/search";
 
 export default function PublicCatalogPage() {
-  const cachedCatalog = useMemo(() => getCachedStoreCatalog(), []);
-  const [settings, setSettings] = useState<PublicStoreSettings | null>(cachedCatalog.settings);
-  const [categories, setCategories] = useState<Category[]>(cachedCatalog.categories);
-  const [products, setProducts] = useState<Product[]>(cachedCatalog.products);
-  const [loading, setLoading] = useState<boolean>(
-    !cachedCatalog.products.length && !cachedCatalog.categories.length
-  );
+  const queryClient = useQueryClient();
+
+  const { data: settings } = useQuery({
+    queryKey: ["public-settings"],
+    queryFn: getPublicStoreSettings,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  const { data: rawCategories } = useQuery({
+    queryKey: ["public-categories"],
+    queryFn: getPublicStoreCategories,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  const categories: Category[] = useMemo(() => {
+    if (!rawCategories) return [];
+    if (Array.isArray(rawCategories)) return rawCategories;
+    return (rawCategories as any).data || [];
+  }, [rawCategories]);
+
+  const { data: rawProducts, isLoading: loadingProducts } = useQuery({
+    queryKey: ["public-products"],
+    queryFn: getPublicStoreProducts,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  const products: any[] = useMemo(() => {
+    if (!rawProducts) return [];
+    const list = Array.isArray(rawProducts) ? rawProducts : (rawProducts as any).data || [];
+    return list.map((p: any) => ({
+      ...p,
+      title: p.title || p.name || "",
+    }));
+  }, [rawProducts]);
+
+  const loading = loadingProducts && !products.length && !categories.length;
+
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
@@ -57,57 +90,23 @@ export default function PublicCatalogPage() {
   };
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        if (!cachedCatalog.products.length) {
-          setLoading(true);
-        }
-        const [settingsData, categoriesData, productsData] = await Promise.all([
-          getPublicStoreSettings().catch(() => null),
-          getPublicStoreCategories().catch(() => []),
-          getPublicStoreProducts().catch(() => []),
-        ]);
-        if (settingsData) setSettings(settingsData);
-        if (categoriesData.length) setCategories(categoriesData);
-        if (productsData.length) setProducts(productsData);
-      } catch (err) {
-        console.error("Erro ao carregar catálogo público:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, [cachedCatalog]);
-
-  useEffect(() => {
-    const refreshCatalog = async () => {
-      try {
-        const [updatedProducts, updatedCategories] = await Promise.all([
-          getPublicStoreProducts(true).catch(() => null),
-          getPublicStoreCategories(true).catch(() => null),
-        ]);
-        if (updatedProducts !== null) setProducts([...updatedProducts]);
-        if (updatedCategories !== null) setCategories([...updatedCategories]);
-      } catch (err) {
-        console.error("Erro ao atualizar catálogo:", err);
-      }
-    };
-
     const socketUrl =
       import.meta.env.VITE_ADMIN_API?.replace(/\/api$/, "") || window.location.origin;
     const socket = io(socketUrl, { transports: ["websocket", "polling"] });
 
-    socket.on("products.refresh", refreshCatalog);
-    socket.on("order.new", refreshCatalog);
+    socket.on("products.refresh", () => {
+      queryClient.invalidateQueries({ queryKey: ["public-products"] });
+      queryClient.invalidateQueries({ queryKey: ["public-categories"] });
+    });
 
-    // Auto-refresh a cada 3 segundos enquanto a tela estiver aberta
-    const intervalId = setInterval(refreshCatalog, 3000);
+    socket.on("order.new", () => {
+      queryClient.invalidateQueries({ queryKey: ["public-products"] });
+    });
 
     return () => {
       socket.disconnect();
-      clearInterval(intervalId);
     };
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     if (settings?.storeName) {
