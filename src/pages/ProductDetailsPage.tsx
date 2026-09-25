@@ -107,20 +107,36 @@ export default function ProductDetailsPage() {
         categoryId: values.categoryId,
         price: values.price,
         costPrice: values.costPrice,
-        stock: values.stock,
+        stock: Number(values.stock) || 0,
         isVisible,
       };
 
+      let savedProduct;
       if (isNewProduct) {
-        return await createProduct(payload);
+        savedProduct = await createProduct(payload);
       } else {
-        return await updateProduct(id!, payload);
+        savedProduct = await updateProduct(id!, payload);
+
+        // Se houver ajuste de quantidade digitado na aba de Estoque, processar também!
+        const qty = Number(stockAdjQuantity);
+        if (!isNaN(qty) && qty > 0) {
+          await updateProductStock(id!, {
+            type: stockAdjType,
+            quantity: qty,
+            observation: stockAdjObs || "Ajuste rápido via Salvar Tudo",
+          });
+          setStockAdjQuantity("");
+          setStockAdjObs("");
+        }
       }
+
+      return savedProduct;
     },
     onSuccess: (savedProduct) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product", savedProduct.id] });
-      toast({ title: isNewProduct ? "Produto criado com sucesso!" : "Produto atualizado com sucesso!" });
+      queryClient.invalidateQueries({ queryKey: ["product-stock-history", savedProduct.id] });
+      toast({ title: isNewProduct ? "Produto criado com sucesso!" : "Produto e estoque salvos com sucesso!" });
       if (isNewProduct) {
         navigate(`/produtos/${savedProduct.id}`, { replace: true });
       }
@@ -350,6 +366,23 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                 />
+
+                <div className="space-y-2">
+                  <Label htmlFor="stock" className="text-sm font-medium">Estoque (Unidades)</Label>
+                  <Input
+                    id="stock"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    className="h-10 rounded-xl font-semibold"
+                    {...form.register("stock", { valueAsNumber: true })}
+                  />
+                  {form.formState.errors.stock && (
+                    <p className="text-sm font-medium text-destructive">
+                      {form.formState.errors.stock.message}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end pt-4 border-t">
