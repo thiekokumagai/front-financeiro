@@ -26,6 +26,12 @@ export type ProductResponse = {
   costPrice?: number;
   stock: number;
   isVisible?: boolean;
+  dailyRunRate?: number;
+  coverageDays?: number | null;
+  minStock?: number;
+  daysWithoutSales?: number;
+  growthPercentage?: number;
+  stockAlertState?: string;
   createdAt: string;
   updatedAt: string;
 };
