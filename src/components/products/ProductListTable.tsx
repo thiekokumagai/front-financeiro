@@ -494,7 +494,7 @@ export function ProductListTable({
           <div className="text-center py-8 text-muted-foreground border rounded-md">Nenhum produto encontrado.</div>
         ) : (
           sorted.map((product) => (
-            <div key={product.id} className="border rounded-md p-4 flex flex-col gap-3 relative bg-card shadow-sm cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/produtos/${product.id}`)}>
+            <div key={product.id} className={`border rounded-md p-4 flex flex-col gap-3 relative bg-card shadow-sm cursor-pointer hover:bg-muted/50 ${!product.isVisible ? 'text-muted-foreground' : ''}`} onClick={() => navigate(`/produtos/${product.id}`)}>
               <div className="absolute top-2 right-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                 <Checkbox
                   id={`select-mobile-${product.id}`}
@@ -517,7 +517,7 @@ export function ProductListTable({
               </div>
 
               <div className="flex flex-col flex-1 min-w-0 pr-16">
-                <span className="font-bold text-foreground text-sm leading-tight">{product.title}</span>
+                <span className={`font-bold text-sm leading-tight ${!product.isVisible ? 'text-muted-foreground' : 'text-foreground'}`}>{product.title}</span>
                 <span className="text-xs text-muted-foreground truncate">{getCategoryName(product.categoryId)}</span>
                 <div className="mt-1 flex items-center gap-2">
                   {product.isVisible ? (
@@ -544,7 +544,7 @@ export function ProductListTable({
                 {onUpdateStock ? (
                   <InlineStockEditor stock={product.stock} onAdd={() => onUpdateStock(product.id, 'ADD', 1)} onSub={() => onUpdateStock(product.id, 'SUBTRACT', 1)} />
                 ) : (
-                  <span className="font-semibold text-foreground text-sm">{product.stock}</span>
+                  <span className={`font-semibold text-sm ${!product.isVisible ? 'text-muted-foreground' : 'text-foreground'}`}>{product.stock}</span>
                 )}
               </div>
             </div>
@@ -607,7 +607,7 @@ export function ProductListTable({
               sorted.map((product) => (
                 <TableRow
                   key={product.id}
-                  className="cursor-pointer hover:bg-muted/50"
+                  className={`cursor-pointer hover:bg-muted/50 ${!product.isVisible ? 'text-muted-foreground' : ''}`}
                   onClick={() => navigate(`/produtos/${product.id}`)}
                 >
                   <TableCell onClick={(e) => e.stopPropagation()}>
@@ -619,7 +619,7 @@ export function ProductListTable({
                     />
                   </TableCell>
                   <TableCell>
-                    <span className="font-medium hover:underline">
+                    <span className={`font-medium hover:underline ${!product.isVisible ? 'text-muted-foreground' : ''}`}>
                       {product.title}
                     </span>
                   </TableCell>
@@ -655,7 +655,7 @@ export function ProductListTable({
                         onSub={() => onUpdateStock(product.id, 'SUBTRACT', 1)}
                       />
                     ) : (
-                      <span className="font-semibold text-foreground">{product.stock}</span>
+                      <span className={`font-semibold ${!product.isVisible ? 'text-muted-foreground' : 'text-foreground'}`}>{product.stock}</span>
                     )}
                   </TableCell>
 

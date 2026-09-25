@@ -60,7 +60,8 @@ const paymentLabels: Record<string, string> = {
 };
 
 export default function OrdersPage() {
-  const [search, setSearch] = useState("");
+  const [orderIdSearch, setOrderIdSearch] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
   const [status, setStatus] = useState("ALL");
   const [paymentStatus, setPaymentStatus] = useState("ALL");
   const [startDate, setStartDate] = useState("");
@@ -68,6 +69,12 @@ export default function OrdersPage() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const limit = 20;
+
+  // Combine order ID and customer (name/phone) search
+  const effectiveSearch = [
+    orderIdSearch.trim(),
+    customerSearch.trim()
+  ].filter(Boolean).join(" ");
 
   useEffect(() => {
     const orderIdParam = searchParams.get("id") || searchParams.get("orderId");
@@ -86,7 +93,7 @@ export default function OrdersPage() {
     }
   };
 
-  const hasFilters = search !== "" || status !== "ALL" || paymentStatus !== "ALL" || startDate !== "" || endDate !== "";
+  const hasFilters = orderIdSearch !== "" || customerSearch !== "" || status !== "ALL" || paymentStatus !== "ALL" || startDate !== "" || endDate !== "";
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -116,7 +123,8 @@ export default function OrdersPage() {
   }, [queryClient]);
 
   const handleClearFilters = () => {
-    setSearch("");
+    setOrderIdSearch("");
+    setCustomerSearch("");
     setStatus("ALL");
     setPaymentStatus("ALL");
     setStartDate("");
@@ -178,7 +186,7 @@ export default function OrdersPage() {
   };
 
   const { data: paginatedData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteOrders(
-    search, 
+    effectiveSearch, 
     status, 
     getValidDateString(startDate), 
     getValidDateString(endDate),
@@ -273,14 +281,26 @@ export default function OrdersPage() {
 
       {/* Toolbar / Filters */}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-slate-200/60 shadow-sm">
-        {/* Search */}
+        {/* Search by Order ID */}
+        <div className="relative w-full sm:w-36 shrink-0">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-xs">#</span>
+          <Input 
+            type="text" 
+            placeholder="Nº Pedido" 
+            value={orderIdSearch}
+            onChange={(e) => setOrderIdSearch(e.target.value)}
+            className="pl-8 h-11 border-slate-200 focus-visible:ring-violet-600 rounded-xl font-medium placeholder:text-slate-400"
+          />
+        </div>
+
+        {/* Search by Customer Name or Phone */}
         <div className="relative w-full sm:flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input 
             type="text" 
-            placeholder="Buscar por ID, nome ou telefone..." 
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); }}
+            placeholder="Nome ou Telefone..." 
+            value={customerSearch}
+            onChange={(e) => setCustomerSearch(e.target.value)}
             className="pl-10 h-11 border-slate-200 focus-visible:ring-violet-600 rounded-xl font-medium placeholder:text-slate-400"
           />
         </div>
