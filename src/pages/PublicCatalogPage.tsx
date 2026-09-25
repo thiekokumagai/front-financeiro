@@ -1,8 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
+import { io } from "socket.io-client";
 import {
   getPublicStoreSettings,
   getPublicStoreCategories,
   getPublicStoreProducts,
+  getCachedStoreCatalog,
   PublicStoreSettings,
 } from "@/services/store-catalog.service";
 import { Product } from "@/types/product";
@@ -26,10 +28,13 @@ import { formatCurrency } from "@/utils/formatters";
 import { matchesProductSearch } from "@/utils/search";
 
 export default function PublicCatalogPage() {
-  const [settings, setSettings] = useState<PublicStoreSettings | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedCatalog = useMemo(() => getCachedStoreCatalog(), []);
+  const [settings, setSettings] = useState<PublicStoreSettings | null>(cachedCatalog.settings);
+  const [categories, setCategories] = useState<Category[]>(cachedCatalog.categories);
+  const [products, setProducts] = useState<Product[]>(cachedCatalog.products);
+  const [loading, setLoading] = useState<boolean>(
+    !cachedCatalog.products.length && !cachedCatalog.categories.length
+  );
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
@@ -54,15 +59,17 @@ export default function PublicCatalogPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        setLoading(true);
+        if (!cachedCatalog.products.length) {
+          setLoading(true);
+        }
         const [settingsData, categoriesData, productsData] = await Promise.all([
           getPublicStoreSettings().catch(() => null),
           getPublicStoreCategories().catch(() => []),
           getPublicStoreProducts().catch(() => []),
         ]);
-        setSettings(settingsData);
-        setCategories(categoriesData);
-        setProducts(productsData);
+        if (settingsData) setSettings(settingsData);
+        if (categoriesData.length) setCategories(categoriesData);
+        if (productsData.length) setProducts(productsData);
       } catch (err) {
         console.error("Erro ao carregar catálogo público:", err);
       } finally {
@@ -70,6 +77,36 @@ export default function PublicCatalogPage() {
       }
     }
     loadData();
+  }, [cachedCatalog]);
+
+  useEffect(() => {
+    const refreshCatalog = async () => {
+      try {
+        const [updatedProducts, updatedCategories] = await Promise.all([
+          getPublicStoreProducts(true).catch(() => []),
+          getPublicStoreCategories(true).catch(() => []),
+        ]);
+        if (updatedProducts.length > 0) setProducts(updatedProducts);
+        if (updatedCategories.length > 0) setCategories(updatedCategories);
+      } catch (err) {
+        console.error("Erro ao atualizar catálogo:", err);
+      }
+    };
+
+    const socketUrl =
+      import.meta.env.VITE_ADMIN_API?.replace(/\/api$/, "") || window.location.origin;
+    const socket = io(socketUrl, { transports: ["websocket", "polling"] });
+
+    socket.on("products.refresh", refreshCatalog);
+    socket.on("order.new", refreshCatalog);
+
+    // Auto-refresh a cada 3 segundos enquanto a tela estiver aberta
+    const intervalId = setInterval(refreshCatalog, 3000);
+
+    return () => {
+      socket.disconnect();
+      clearInterval(intervalId);
+    };
   }, []);
 
   useEffect(() => {
@@ -373,7 +410,7 @@ export default function PublicCatalogPage() {
                         <div className="flex items-center shrink-0">
                           {isOutOfStock ? (
                             <span className="text-xs font-bold text-rose-400 bg-rose-950/60 border border-rose-800/60 px-3 py-1.5 rounded-xl inline-block">
-                              Indisponível
+                              Esgotado
                             </span>
                           ) : (
                             <span className="text-sm font-black text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-400 px-4 py-1.5 rounded-xl tracking-tight inline-block shadow-md shadow-emerald-500/20">
