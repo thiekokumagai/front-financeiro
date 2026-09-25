@@ -35,6 +35,7 @@ export default function PublicCatalogPage() {
     queryFn: getPublicStoreSettings,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 
   const { data: rawCategories } = useQuery({
@@ -42,6 +43,7 @@ export default function PublicCatalogPage() {
     queryFn: getPublicStoreCategories,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 
   const categories: Category[] = useMemo(() => {
@@ -55,6 +57,7 @@ export default function PublicCatalogPage() {
     queryFn: getPublicStoreProducts,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 
   const products: any[] = useMemo(() => {
@@ -231,6 +234,8 @@ export default function PublicCatalogPage() {
             <img
               src="/banner-gym.png"
               alt="Fitness Hero Banner"
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover object-top scale-105 group-hover:scale-110 transition-transform duration-1000 ease-out"
             />
             {/* Cinematic Video Overlay Gradients */}
@@ -263,6 +268,8 @@ export default function PublicCatalogPage() {
                   <img
                     src={storeLogo}
                     alt={settings?.storeName || "Logo"}
+                    loading="lazy"
+                    decoding="async"
                     className="h-16 w-auto object-contain max-w-[200px]"
                   />
                 </div>
@@ -354,7 +361,14 @@ export default function PublicCatalogPage() {
         </div>
 
         {/* Products List Grouped */}
-        {groupedProducts.length === 0 ? (
+        {loadingProducts && products.length === 0 ? (
+          <div className="py-16 text-center text-emerald-400 space-y-3 bg-slate-900/40 border border-slate-800/60 rounded-3xl backdrop-blur-md">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500/30 border-t-emerald-400 mx-auto" />
+            <p className="text-sm font-black tracking-wider uppercase text-emerald-400 animate-pulse">
+              Carregando produtos...
+            </p>
+          </div>
+        ) : groupedProducts.length === 0 ? (
           <div className="py-16 text-center text-slate-500 space-y-3 bg-slate-900/40 border border-slate-800/60 rounded-3xl backdrop-blur-md">
             <div className="w-12 h-12 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center mx-auto text-slate-400">
               <Search className="h-6 w-6" />
