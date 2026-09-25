@@ -83,11 +83,11 @@ export default function PublicCatalogPage() {
     const refreshCatalog = async () => {
       try {
         const [updatedProducts, updatedCategories] = await Promise.all([
-          getPublicStoreProducts(true).catch(() => []),
-          getPublicStoreCategories(true).catch(() => []),
+          getPublicStoreProducts(true).catch(() => null),
+          getPublicStoreCategories(true).catch(() => null),
         ]);
-        if (updatedProducts.length > 0) setProducts(updatedProducts);
-        if (updatedCategories.length > 0) setCategories(updatedCategories);
+        if (updatedProducts !== null) setProducts([...updatedProducts]);
+        if (updatedCategories !== null) setCategories([...updatedCategories]);
       } catch (err) {
         console.error("Erro ao atualizar catálogo:", err);
       }
