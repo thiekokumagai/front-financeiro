@@ -366,23 +366,6 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                 />
-
-                <div className="space-y-2">
-                  <Label htmlFor="stock" className="text-sm font-medium">Estoque (Unidades)</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    className="h-10 rounded-xl font-semibold"
-                    {...form.register("stock", { valueAsNumber: true })}
-                  />
-                  {form.formState.errors.stock && (
-                    <p className="text-sm font-medium text-destructive">
-                      {form.formState.errors.stock.message}
-                    </p>
-                  )}
-                </div>
               </div>
 
               <div className="flex justify-end pt-4 border-t">
