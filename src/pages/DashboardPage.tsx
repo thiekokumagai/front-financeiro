@@ -190,13 +190,7 @@ export default function DashboardPage() {
       value: stats ? stats.totalProdutosVendidos : 0,
       icon: Package,
       color: "text-warning bg-warning/10",
-    },
-    {
-      label: "Venda Total Estoque",
-      value: `R$ ${(stats?.valorVendaTotalProdutos || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-      icon: DollarSign,
-      color: "text-primary bg-primary/10",
-    },
+    }    
   ];
 
   const inventoryCards = [
@@ -223,6 +217,12 @@ export default function DashboardPage() {
       value: stats?.produtosInativos || 0,
       icon: XCircle,
       color: "text-slate-600 bg-slate-200",
+    },
+    {
+      label: "Venda Total Estoque",
+      value: `R$ ${(stats?.valorVendaTotalProdutos || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+      icon: DollarSign,
+      color: "text-primary bg-primary/10",
     },
   ];
 
@@ -357,7 +357,7 @@ export default function DashboardPage() {
           )}
 
           {/* KPI Cards (Visão Geral de Vendas - 5 cards) */}
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-4">
             {kpiCards.map((card, idx) => {
               const IconComponent = card.icon;
               return (
@@ -381,7 +381,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Cards de Estoque (Produtos Ativos, Qtd Total, Custo, Produtos Inativos) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {inventoryCards.map((card, idx) => {
               const IconComponent = card.icon;
               return (

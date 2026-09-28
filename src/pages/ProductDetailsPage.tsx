@@ -4,8 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Save, History, Clock } from "lucide-react";
+import { ArrowLeft, Save, History, Clock, TrendingUp, TrendingDown, Percent } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
+import { calculateProfitMargin, formatCurrency } from "@/utils/formatters";
 import {
   createProduct,
   getProductById,
@@ -177,6 +178,13 @@ export default function ProductDetailsPage() {
     },
   });
 
+  const watchPrice = form.watch("price");
+  const watchCostPrice = form.watch("costPrice");
+
+  const profitCalc = useMemo(() => {
+    return calculateProfitMargin(watchPrice, watchCostPrice);
+  }, [watchPrice, watchCostPrice]);
+
   const currentStock = product?.stock ?? form.watch("stock") ?? 0;
 
   const predictedStock = useMemo(() => {
@@ -310,7 +318,33 @@ export default function ProductDetailsPage() {
                     </p>
                   )}
                 </div>
-
+                <Controller
+                  name="costPrice"
+                  control={form.control}
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <Label htmlFor="costPrice" className="text-sm font-medium">Preço de custo (R$)</Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
+                        <Input inputMode="decimal"
+                          id="costPrice"
+                          type="text"
+                          placeholder="0,00"
+                          value={
+                            field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
+                              ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value))
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const digits = e.target.value.replace(/\D/g, "");
+                            field.onChange(digits ? Number(digits) / 100 : undefined);
+                          }}
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+                  )}
+                />
                 <Controller
                   name="price"
                   control={form.control}
@@ -339,33 +373,56 @@ export default function ProductDetailsPage() {
                   )}
                 />
 
-                <Controller
-                  name="costPrice"
-                  control={form.control}
-                  render={({ field }) => (
-                    <div className="space-y-2">
-                      <Label htmlFor="costPrice" className="text-sm font-medium">Preço de custo (R$)</Label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                        <Input inputMode="decimal"
-                          id="costPrice"
-                          type="text"
-                          placeholder="0,00"
-                          value={
-                            field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
-                              ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value))
-                              : ""
-                          }
-                          onChange={(e) => {
-                            const digits = e.target.value.replace(/\D/g, "");
-                            field.onChange(digits ? Number(digits) / 100 : undefined);
-                          }}
-                          className="pl-9 h-10 rounded-xl"
-                        />
+                
+
+                {/* Painel Informativo de Porcentagem de Lucro e Margem */}
+                <div className="sm:col-span-2 rounded-2xl border p-4 transition-all bg-card shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                      <Percent className="h-3.5 w-3.5 text-primary" />
+                      Análise de Lucratividade
+                    </span>
+                    {profitCalc.hasProfitInfo && (
+                      <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                        profitCalc.isNegative
+                          ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400"
+                          : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"
+                      }`}>
+                        {profitCalc.isNegative ? <TrendingDown className="h-3.5 w-3.5" /> : <TrendingUp className="h-3.5 w-3.5" />}
+                        {profitCalc.isNegative ? "Prejuízo" : "Lucro Estimado"}
+                      </span>
+                    )}
+                  </div>
+
+                  {profitCalc.hasProfitInfo ? (
+                    <div className="grid grid-cols-3 gap-3 text-center">
+                      <div className="bg-muted/40 p-3 rounded-xl">
+                        <span className="text-[11px] text-muted-foreground font-semibold block">Lucro Bruto</span>
+                        <span className={`text-base font-extrabold block ${profitCalc.isNegative ? "text-rose-600" : "text-emerald-600"}`}>
+                          {formatCurrency(profitCalc.profit)}
+                        </span>
+                      </div>
+                      <div className="bg-muted/40 p-3 rounded-xl">
+                        <span className="text-[11px] text-muted-foreground font-semibold block">Margem de Lucro</span>
+                        <span className={`text-base font-extrabold block ${profitCalc.isNegative ? "text-rose-600" : "text-emerald-600"}`}>
+                          {profitCalc.marginPercentage.toFixed(2)}%
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">(sobre a venda)</span>
+                      </div>
+                      <div className="bg-muted/40 p-3 rounded-xl">
+                        <span className="text-[11px] text-muted-foreground font-semibold block">Markup</span>
+                        <span className={`text-base font-extrabold block ${profitCalc.isNegative ? "text-rose-600" : "text-emerald-600"}`}>
+                          {profitCalc.markupPercentage.toFixed(2)}%
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">(sobre o custo)</span>
                       </div>
                     </div>
+                  ) : (
+                    <div className="py-2 text-center text-xs text-muted-foreground">
+                      Informe o <strong>Preço de Venda</strong> e o <strong>Preço de Custo</strong> para calcular a porcentagem de lucro em tempo real.
+                    </div>
                   )}
-                />
+                </div>
               </div>
 
               <div className="flex justify-end pt-4 border-t">
