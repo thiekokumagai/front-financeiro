@@ -485,17 +485,6 @@ export default function DashboardPage() {
                         key={item.id}
                         className="flex items-center gap-3 p-2 hover:bg-muted/30 rounded-xl transition-colors"
                       >
-                        {item.imageUrl ? (
-                          <img
-                            src={buildImageUrl(item.imageUrl)}
-                            alt={item.title}
-                            className="h-10 w-10 rounded-xl object-cover border"
-                          />
-                        ) : (
-                          <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground border">
-                            <Package className="h-4 w-4" />
-                          </div>
-                        )}
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold text-foreground truncate">{item.title}</p>
                           <p className="text-[10px] text-muted-foreground">{item.categoryTitle}</p>
