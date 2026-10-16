@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCustomerDetails, useUpdateCustomer } from "@/hooks/useCustomers";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, User, Phone, MapPin, CalendarDays, Edit2, Save, ArrowLeft, ShoppingBag, Copy, Check, DollarSign, Package } from "lucide-react";
+import { Loader2, User, Phone, CalendarDays, Edit2, Save, ArrowLeft, ShoppingBag, DollarSign, Package } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import OrderDetailDrawer from "@/components/OrderDetailDrawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,24 +20,6 @@ export default function CustomerDetailsPage() {
   const [editData, setEditData] = useState({ name: "", phone: "" });
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [copiedAddress, setCopiedAddress] = useState(false);
-
-  const defaultAddress = customer?.addresses?.find(a => a.isDefault);
-
-  const handleCopyAddress = () => {
-    if (!defaultAddress) return;
-    let addressStr = `${defaultAddress.street}, ${defaultAddress.number}`;
-    if (defaultAddress.neighborhood && defaultAddress.neighborhood.trim()) {
-      const cleanNeigh = defaultAddress.neighborhood.trim().replace(/^bairro\s+/i, '');
-      if (cleanNeigh) {
-        addressStr += `, ${cleanNeigh}`;
-      }
-    }
-    navigator.clipboard.writeText(addressStr);
-    setCopiedAddress(true);
-    toast({ title: "Endereço copiado!" });
-    setTimeout(() => setCopiedAddress(false), 2000);
-  };
 
   useEffect(() => {
     if (customer) {
@@ -119,14 +101,10 @@ export default function CustomerDetailsPage() {
           </div>
 
           <Tabs defaultValue="dados" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 gap-2 h-auto p-1.5 bg-muted/60">
+            <TabsList className="grid w-full grid-cols-2 gap-2 h-auto p-1.5 bg-muted/60">
               <TabsTrigger value="dados" className="flex items-center gap-2 py-2 px-3 justify-center text-xs font-semibold">
                 <User className="h-4 w-4" />
                 Dados Pessoais
-              </TabsTrigger>
-              <TabsTrigger value="enderecos" className="flex items-center gap-2 py-2 px-3 justify-center text-xs font-semibold">
-                <MapPin className="h-4 w-4" />
-                Endereços Salvos
               </TabsTrigger>
               <TabsTrigger value="pedidos" className="flex items-center gap-2 py-2 px-3 justify-center text-xs font-semibold">
                 <ShoppingBag className="h-4 w-4" />
@@ -235,81 +213,6 @@ export default function CustomerDetailsPage() {
                     <CalendarDays className="h-4 w-4" />
                     Cadastrado em {new Date(customer.createdAt).toLocaleDateString('pt-BR')}
                   </div>
-                </div>
-
-                {/* Último Endereço Usado (Principal) */}
-                {defaultAddress && (
-                  <div className="bg-white rounded-xl border border-slate-200/60 p-4 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">
-                      ÚLTIMO UTILIZADO (PRINCIPAL)
-                    </div>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-bold text-slate-800 text-base">{defaultAddress.street}, {defaultAddress.number}</p>
-                        <p className="text-sm text-slate-500 font-medium">{defaultAddress.neighborhood}</p>
-                        <p className="text-sm text-slate-500 font-medium">{defaultAddress.city} - {defaultAddress.state}</p>
-                        <p className="text-sm text-slate-500 font-medium mt-1 tracking-widest">{defaultAddress.cep}</p>
-                        {defaultAddress.complement && (
-                          <p className="text-sm text-slate-400 mt-2 italic">{defaultAddress.complement}</p>
-                        )}
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        onClick={handleCopyAddress}
-                        className="h-8 w-8 text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-colors shrink-0"
-                        title="Copiar Endereço"
-                      >
-                        {copiedAddress ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="enderecos" className="space-y-4 outline-none">
-              {/* Endereços */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-slate-400" />
-                  Endereços Salvos ({customer.addresses?.length || 0})
-                </h3>
-
-                <div className="space-y-3">
-                  {customer.addresses?.length === 0 ? (
-                    <div className="bg-white rounded-xl border border-slate-200/60 p-6 text-center text-slate-400 font-medium text-sm">
-                      Nenhum endereço salvo.
-                    </div>
-                  ) : (
-                    [...customer.addresses]
-                      .sort((a, b) => {
-                        if (a.isDefault && !b.isDefault) return -1;
-                        if (!a.isDefault && b.isDefault) return 1;
-                        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                        return dateB - dateA; // Descending
-                      })
-                      .map((addr, index) => {
-                        const isPrincipal = index === 0 && (addr.id === defaultAddress?.id || addr.isDefault);
-                        return (
-                          <div key={addr.id} className="bg-white rounded-xl border border-slate-200/60 p-4 shadow-sm relative overflow-hidden">
-                            {isPrincipal && (
-                              <div className="absolute top-0 right-0 bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">
-                                ÚLTIMO UTILIZADO (PRINCIPAL)
-                              </div>
-                            )}
-                            <p className="font-bold text-slate-800 text-base">{addr.street}, {addr.number}</p>
-                            <p className="text-sm text-slate-500 font-medium">{addr.neighborhood}</p>
-                            <p className="text-sm text-slate-500 font-medium">{addr.city} - {addr.state}</p>
-                            <p className="text-sm text-slate-500 font-medium mt-1 tracking-widest">{addr.cep}</p>
-                            {addr.complement && (
-                              <p className="text-sm text-slate-400 mt-2 italic">{addr.complement}</p>
-                            )}
-                          </div>
-                        );
-                      })
-                  )}
                 </div>
               </div>
             </TabsContent>
