@@ -722,20 +722,9 @@ export default function PublicCatalogPage() {
               )}
             </div>
 
-            {/* Preview do texto que será enviado */}
+            {/* Ação de Enviar Orçamento */}
             {cartList.length > 0 && (
-              <div className="p-4 bg-slate-950/80 border-t border-slate-800 space-y-3">
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 space-y-1">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                    Prévia do texto no WhatsApp:
-                  </span>
-                  {cartList.map((item) => (
-                    <div key={item.product.id} className="text-emerald-300">
-                      - {item.quantity}x {item.product.title || item.product.name}
-                    </div>
-                  ))}
-                </div>
-
+              <div className="p-4 bg-slate-950/80 border-t border-slate-800">
                 <button
                   onClick={() => {
                     handleSendCartWhatsApp();
