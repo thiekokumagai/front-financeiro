@@ -50,21 +50,20 @@ export function openWhatsApp(
   );
 
   if (isMobile) {
-    // Em dispositivos móveis, URL scheme direto para disparar o aplicativo do WhatsApp
-    // Ex: whatsapp://send?phone=5511999999999&text=...
-    window.location.href = urlApp;
-
-    // Fallback se por acaso o app não responder após 1.2s
+    // Em dispositivos móveis com WhatsApp instalado, o scheme whatsapp:// abre direto o app nativo
+    // Se targetPhone existir: whatsapp://send?phone=...&text=...
+    // Se não existir (compartilhar): whatsapp://send?text=...
+    // Criamos um link oculto e clicamos ou usamos window.location para o SO chamar o app instalado imediatamente
+    const a = document.createElement("a");
+    a.href = urlApp;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
     setTimeout(() => {
-      if (document.visibilityState === "visible") {
-        const fallbackUrl = targetPhone
-          ? `https://api.whatsapp.com/send?phone=${targetPhone}${encodedMessage ? `&text=${encodedMessage}` : ""}`
-          : `https://api.whatsapp.com/send?text=${encodedMessage}`;
-        window.location.href = fallbackUrl;
-      }
-    }, 1200);
+      document.body.removeChild(a);
+    }, 500);
   } else {
-    // Em desktop, web.whatsapp.com ou wa.me/api
+    // Em desktop, abre o WhatsApp Web diretamente
     window.open(urlWeb, "_blank", "noopener,noreferrer");
   }
 }
