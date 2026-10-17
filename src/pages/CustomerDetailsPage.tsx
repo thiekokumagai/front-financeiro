@@ -233,7 +233,6 @@ export default function CustomerDetailsPage() {
                             size="sm"
                             onClick={() => openWhatsApp({
                               phone: customer.phone,
-                              text: `Olá ${customer.name}!`
                             })}
                             className="h-8 border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg gap-1.5 font-bold text-xs"
                           >
