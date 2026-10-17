@@ -389,7 +389,7 @@ export default function PublicCatalogPage() {
         </header>
 
         {/* Search & Category Filter Section - Fixo na Rolagem */}
-        <div className="sticky top-0 z-30 -mx-4 px-4 py-3 bg-[#06090e]/95 backdrop-blur-md border-b border-slate-800/80 shadow-md space-y-2.5">
+        <div className="sticky top-0 z-40 bg-[#06090e] border-b border-slate-800/80 shadow-xl pb-2 pt-2 -mx-4 px-4 space-y-2.5">
           {/* Search Input */}
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
