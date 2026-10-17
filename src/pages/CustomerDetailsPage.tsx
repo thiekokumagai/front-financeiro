@@ -86,7 +86,6 @@ export default function CustomerDetailsPage() {
               <Button
                 onClick={() => openWhatsApp({
                   phone: customer.phone,
-                  text: `Olá ${customer.name}! Tudo bem?`
                 })}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm gap-2 h-10 px-4"
               >

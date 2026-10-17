@@ -3,9 +3,10 @@ import { useInfiniteCustomers } from "@/hooks/useCustomers";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2, Users, ArrowRight, X } from "lucide-react";
+import { Search, Loader2, Users, ArrowRight, X, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatPhone } from "@/utils/formatters";
+import { openWhatsApp } from "@/utils/whatsapp";
 
 export default function CustomersPage() {
   const [search, setSearch] = useState("");
@@ -148,8 +149,24 @@ export default function CustomersPage() {
                   <span className="font-mono text-slate-500 text-xs">{formatPhone(customer.phone)}</span>
                   <span className="text-slate-400 text-[10px] mt-1">Cadastro: {new Date(customer.createdAt).toLocaleDateString("pt-BR")}</span>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400">
-                  <ArrowRight className="h-4 w-4" />
+                <div className="flex items-center gap-2">
+                  {customer.phone && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openWhatsApp({
+                          phone: customer.phone,
+                        });
+                      }}
+                      title="Chamar no WhatsApp"
+                      className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 hover:bg-emerald-100 transition-colors"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </button>
+                  )}
+                  <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400">
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -185,8 +202,24 @@ export default function CustomersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white group-hover:border-violet-600 transition-all shrink-0">
-                      <ArrowRight className="h-4 w-4" />
+                    <div className="flex items-center gap-2 justify-end pr-2">
+                      {customer.phone && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openWhatsApp({
+                              phone: customer.phone,
+                            });
+                          }}
+                          title="Conversar no WhatsApp"
+                          className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shrink-0"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </button>
+                      )}
+                      <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white group-hover:border-violet-600 transition-all shrink-0">
+                        <ArrowRight className="h-4 w-4" />
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>
