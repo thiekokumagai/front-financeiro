@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCustomerDetails, useUpdateCustomer } from "@/hooks/useCustomers";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, User, Phone, CalendarDays, Edit2, Save, ArrowLeft, ShoppingBag, DollarSign, Package } from "lucide-react";
+import { Loader2, User, Phone, CalendarDays, Edit2, Save, ArrowLeft, ShoppingBag, DollarSign, Package, MessageCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import OrderDetailDrawer from "@/components/OrderDetailDrawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPhone } from "@/utils/formatters";
+import { openWhatsApp } from "@/utils/whatsapp";
 
 export default function CustomerDetailsPage() {
   const { id: customerId } = useParams<{ id: string }>();
@@ -20,6 +21,13 @@ export default function CustomerDetailsPage() {
   const [editData, setEditData] = useState({ name: "", phone: "" });
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+  // Garantir que a interna do cliente sempre abra no topo do scroll
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const mainEl = document.querySelector("main");
+    if (mainEl) mainEl.scrollTop = 0;
+  }, []);
 
   useEffect(() => {
     if (customer) {
@@ -73,6 +81,19 @@ export default function CustomerDetailsPage() {
                 <p className="text-sm text-slate-500 font-medium">Visualize as informações e o histórico completo do cliente</p>
               </div>
             </div>
+
+            {customer.phone && (
+              <Button
+                onClick={() => openWhatsApp({
+                  phone: customer.phone,
+                  text: `Olá ${customer.name}! Tudo bem?`
+                })}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm gap-2 h-10 px-4"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>Conversar no WhatsApp</span>
+              </Button>
+            )}
           </div>
 
           {/* Cards Resumo */}
@@ -202,9 +223,25 @@ export default function CustomerDetailsPage() {
                         className="h-9 border-slate-200 focus-visible:ring-violet-600 rounded-xl"
                       />
                     ) : (
-                      <div className="font-semibold text-slate-800 text-base flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-slate-400" />
-                        {formatPhone(customer.phone)}
+                      <div className="flex items-center justify-between">
+                        <div className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-slate-400" />
+                          {formatPhone(customer.phone)}
+                        </div>
+                        {customer.phone && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openWhatsApp({
+                              phone: customer.phone,
+                              text: `Olá ${customer.name}!`
+                            })}
+                            className="h-8 border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg gap-1.5 font-bold text-xs"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
+                            WhatsApp
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>

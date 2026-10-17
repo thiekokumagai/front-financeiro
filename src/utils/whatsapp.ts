@@ -45,16 +45,26 @@ export function openWhatsApp(
     urlWeb = `https://api.whatsapp.com/send?text=${encodedMessage}`;
   }
 
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(
+    typeof navigator !== "undefined" ? navigator.userAgent : ""
+  );
 
   if (isMobile) {
+    // Em dispositivos móveis, URL scheme direto para disparar o aplicativo do WhatsApp
+    // Ex: whatsapp://send?phone=5511999999999&text=...
     window.location.href = urlApp;
+
+    // Fallback se por acaso o app não responder após 1.2s
     setTimeout(() => {
       if (document.visibilityState === "visible") {
-        window.open(urlWeb, "_blank", "noopener,noreferrer");
+        const fallbackUrl = targetPhone
+          ? `https://api.whatsapp.com/send?phone=${targetPhone}${encodedMessage ? `&text=${encodedMessage}` : ""}`
+          : `https://api.whatsapp.com/send?text=${encodedMessage}`;
+        window.location.href = fallbackUrl;
       }
-    }, 1500);
+    }, 1200);
   } else {
+    // Em desktop, web.whatsapp.com ou wa.me/api
     window.open(urlWeb, "_blank", "noopener,noreferrer");
   }
 }

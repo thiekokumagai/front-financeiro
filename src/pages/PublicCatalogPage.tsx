@@ -23,6 +23,11 @@ import {
   Clock,
   HeartPulse,
   Sparkles,
+  Plus,
+  Minus,
+  ShoppingCart,
+  Trash2,
+  X,
 } from "lucide-react";
 import { formatCurrency } from "@/utils/formatters";
 import { matchesProductSearch } from "@/utils/search";
@@ -75,6 +80,80 @@ export default function PublicCatalogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Mini carrinho de orçamento na memória (sem salvar no banco)
+  const [cart, setCart] = useState<Record<string, { product: any; quantity: number }>>({});
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const cartList = useMemo(() => {
+    return Object.values(cart).filter((item) => item.quantity > 0);
+  }, [cart]);
+
+  const totalCartItems = useMemo(() => {
+    return cartList.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cartList]);
+
+  const handleAddToCart = (product: any) => {
+    setCart((prev) => {
+      const current = prev[product.id]?.quantity || 0;
+      return {
+        ...prev,
+        [product.id]: {
+          product,
+          quantity: current + 1,
+        },
+      };
+    });
+  };
+
+  const handleUpdateQuantity = (productId: string, delta: number) => {
+    setCart((prev) => {
+      const current = prev[productId];
+      if (!current) return prev;
+      const newQty = current.quantity + delta;
+      if (newQty <= 0) {
+        const next = { ...prev };
+        delete next[productId];
+        return next;
+      }
+      return {
+        ...prev,
+        [productId]: {
+          ...current,
+          quantity: newQty,
+        },
+      };
+    });
+  };
+
+  const handleRemoveFromCart = (productId: string) => {
+    setCart((prev) => {
+      const next = { ...prev };
+      delete next[productId];
+      return next;
+    });
+  };
+
+  const handleClearCart = () => {
+    setCart({});
+  };
+
+  const handleSendCartWhatsApp = () => {
+    if (cartList.length === 0) return;
+
+    // Enviar apenas a listagem dos itens exatamente como solicitado:
+    // - 2x Enantato
+    // - 1x Deca
+    const lines = cartList.map(
+      (item) => `- ${item.quantity}x ${item.product.title || item.product.name}`
+    );
+    const message = lines.join("\n");
+
+    openWhatsApp({
+      phone: settings?.phone,
+      text: message,
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -190,10 +269,15 @@ export default function PublicCatalogPage() {
     });
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2200);
+  const handleShareCatalogWhatsApp = () => {
+    const storeTitle = settings?.storeName || "nosso catálogo";
+    const currentUrl = window.location.href;
+    const message = `Olá! Confira o catálogo completo de *${storeTitle}*:\n\n${currentUrl}`;
+
+    openWhatsApp({
+      phone: null,
+      text: message,
+    });
   };
 
   if (loading) {
@@ -215,20 +299,10 @@ export default function PublicCatalogPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-[#06090e] text-slate-100 font-sans pb-36 relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
-      {/* Optimized Lightweight Background Layer for Mobile Performance */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#06090e]">
-        {/* Static Soft Ambient Glows (No heavy animated blurs) */}
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -left-32 w-64 h-64 bg-cyan-500/5 rounded-full blur-2xl" />
-
-        {/* Lightweight Static Mesh Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98108_1px,transparent_1px),linear-gradient(to_bottom,#10b98108_1px,transparent_1px)] bg-[size:32px_32px]" />
-      </div>
-
+    <div className="min-h-screen bg-[#06090e] text-slate-100 font-sans pb-36 relative selection:bg-emerald-500 selection:text-slate-950">
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-4 space-y-6">
-        {/* Header Branding Card with Muscular Fitness Hero Banner & Video Motion Effect */}
-        <header className="relative overflow-hidden rounded-3xl bg-slate-950 border border-slate-800/90 text-center backdrop-blur-xl shadow-2xl space-y-4 group">
+        {/* Header Branding Card com Banner Hero */}
+        <header className="relative overflow-hidden rounded-3xl bg-slate-950 border border-slate-800/90 text-center shadow-2xl space-y-4 group">
           {/* Hero Banner Image */}
           <div className="relative h-48 sm:h-56 w-full overflow-hidden">
             <img
@@ -238,22 +312,19 @@ export default function PublicCatalogPage() {
               decoding="async"
               className="w-full h-full object-cover object-top scale-105 group-hover:scale-110 transition-transform duration-1000 ease-out"
             />
-            {/* Cinematic Video Overlay Gradients */}
+            {/* Overlay Gradients */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 via-transparent to-slate-950/70" />
 
             <div className="absolute top-3 right-3 z-10">
               <button
-                onClick={handleCopyLink}
-                className="inline-flex items-center gap-1.5 text-xs text-slate-200 hover:text-emerald-300 bg-slate-950/90 hover:bg-slate-900 border border-slate-700/80 px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-lg"
+                onClick={handleShareCatalogWhatsApp}
+                title="Compartilhar no WhatsApp"
+                className="inline-flex items-center gap-1.5 text-xs text-slate-100 hover:text-white bg-emerald-600/90 hover:bg-emerald-500 border border-emerald-400/50 px-3.5 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-lg backdrop-blur-sm"
               >
-                {copiedLink ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-400 animate-in zoom-in" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5 text-emerald-400" />
-                )}
-                <span className="font-semibold text-[11px]">
-                  {copiedLink ? "Link Copiado!" : "Compartilhar"}
+                <MessageCircle className="h-3.5 w-3.5 fill-current text-white" />
+                <span className="font-bold text-[11px] tracking-wide">
+                  Compartilhar
                 </span>
               </button>
             </div>
@@ -306,39 +377,39 @@ export default function PublicCatalogPage() {
           </div>
         </header>
 
-        {/* Search & Category Filter Section */}
-        <div className="space-y-3.5 sticky top-3 z-30 pt-1">
-          {/* Glass Search Input */}
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-400/70 group-focus-within:text-emerald-400 transition-colors" />
+        {/* Search & Category Filter Section - Fixo na Rolagem */}
+        <div className="sticky top-0 z-30 -mx-4 px-4 py-3 bg-[#06090e]/95 backdrop-blur-md border-b border-slate-800/80 shadow-md space-y-2.5">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar por medicamento, princípio ativo ou dosagem..."
+              placeholder="Buscar por produto, princípio ativo ou dosagem..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-11 pr-4 bg-slate-900 border border-slate-800 focus:border-emerald-500/70 rounded-2xl text-[15px] text-slate-100 placeholder:text-slate-500 focus:outline-none transition-all shadow-xl focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full h-11 pl-10 pr-4 bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-xl text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-white bg-slate-800/80 px-2 py-1 rounded-md"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-white bg-slate-800 px-2 py-0.5 rounded"
               >
                 Limpar
               </button>
             )}
           </div>
 
-          {/* Glass Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
+          {/* Category Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 hide-scrollbar">
             <button
               onClick={() => setSelectedCategory("ALL")}
-              className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider uppercase whitespace-nowrap transition-all duration-200 border ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase whitespace-nowrap transition-colors border ${
                 selectedCategory === "ALL"
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 border-emerald-400 shadow-lg shadow-emerald-500/25 scale-[1.02]"
-                  : "bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-slate-800/80 backdrop-blur-md"
+                  ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-sm"
+                  : "bg-slate-900 text-slate-400 hover:text-slate-200 border-slate-800"
               }`}
             >
-              TODOS OS ITENS ({products.length})
+              TODOS ({products.length})
             </button>
 
             {categories.map((cat) => {
@@ -347,10 +418,10 @@ export default function PublicCatalogPage() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider uppercase whitespace-nowrap transition-all duration-200 border ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase whitespace-nowrap transition-colors border ${
                     selectedCategory === cat.id
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 border-emerald-400 shadow-lg shadow-emerald-500/25 scale-[1.02]"
-                      : "bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-slate-800/80 backdrop-blur-md"
+                      ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-sm"
+                      : "bg-slate-900 text-slate-400 hover:text-slate-200 border-slate-800"
                   }`}
                 >
                   {cat.title.toUpperCase()} ({count})
@@ -379,20 +450,19 @@ export default function PublicCatalogPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {groupedProducts.map((group, idx) => (
-              <section key={group.category?.id || idx} className="space-y-3.5">
-                {/* Category Header with Lighter Highlighted Background */}
-                <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 shadow-md backdrop-blur-md">
-                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/80 animate-pulse" />
-                  <h2 className="text-xs font-black uppercase tracking-widest text-emerald-300 whitespace-nowrap">
-                    {group.category?.title || "Outros Medicamentos & Suplementos"}
+              <section key={group.category?.id || idx} className="space-y-2.5">
+                {/* Category Header Limpo */}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+                  <div className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <h2 className="text-xs font-black uppercase tracking-wider text-emerald-400">
+                    {group.category?.title || "Outros Produtos"}
                   </h2>
-                  <div className="h-px w-full bg-gradient-to-r from-emerald-400/50 via-emerald-500/20 to-transparent" />
                 </div>
 
                 {/* Product Cards Container */}
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   {group.items.map((product) => {
                     const isOutOfStock =
                       product.stock !== undefined &&
@@ -402,33 +472,67 @@ export default function PublicCatalogPage() {
                     return (
                       <div
                         key={product.id}
-                        className="group relative flex items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-emerald-500/40 shadow-md"
+                        className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors"
                       >
                         {/* Product Details */}
-                        <div className="min-w-0 flex-1 pl-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm sm:text-base font-black tracking-tight text-white uppercase group-hover:text-emerald-300 transition-colors">
-                              {product.title}
-                            </span>
-                          </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="text-sm font-bold text-white uppercase block">
+                            {product.title}
+                          </span>
 
                           {product.description && (
-                            <p className="text-xs text-slate-400 font-medium leading-relaxed mt-1 line-clamp-2">
+                            <p className="text-xs text-slate-400 font-normal mt-0.5 line-clamp-1">
                               {product.description}
                             </p>
                           )}
                         </div>
 
-                        {/* Price Badge Only */}
-                        <div className="flex items-center shrink-0">
+                        {/* Price & Cart Actions */}
+                        <div className="flex items-center gap-2 shrink-0">
                           {isOutOfStock ? (
-                            <span className="text-xs font-bold text-rose-400 bg-rose-950/60 border border-rose-800/60 px-3 py-1.5 rounded-xl inline-block">
+                            <span className="text-xs font-bold text-rose-400 bg-rose-950/60 border border-rose-800/60 px-2.5 py-1 rounded-lg inline-block">
                               Esgotado
                             </span>
                           ) : (
-                            <span className="text-sm font-black text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-400 px-4 py-1.5 rounded-xl tracking-tight inline-block shadow-md shadow-emerald-500/20">
-                              {formatCurrency(Number(product.price) || 0)}
-                            </span>
+                            <>
+                              <span className="text-xs sm:text-sm font-bold text-emerald-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 inline-block">
+                                {formatCurrency(Number(product.price) || 0)}
+                              </span>
+
+                              {cart[product.id] && cart[product.id].quantity > 0 ? (
+                                <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg p-0.5">
+                                  <button
+                                    onClick={() => handleUpdateQuantity(product.id, -1)}
+                                    className="w-6 h-6 rounded flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                                    title="Diminuir"
+                                    aria-label="Diminuir"
+                                  >
+                                    <Minus className="h-3 w-3" />
+                                  </button>
+                                  <span className="w-5 text-center text-xs font-bold text-emerald-400">
+                                    {cart[product.id].quantity}
+                                  </span>
+                                  <button
+                                    onClick={() => handleUpdateQuantity(product.id, 1)}
+                                    className="w-6 h-6 rounded flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                                    title="Aumentar"
+                                    aria-label="Aumentar"
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleAddToCart(product)}
+                                  className="h-7 px-2.5 rounded-lg bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-emerald-400 border border-slate-700 transition-colors flex items-center gap-1 text-xs font-bold"
+                                  title="Adicionar ao orçamento"
+                                  aria-label="Adicionar ao orçamento"
+                                >
+                                  <Plus className="h-3 w-3" />
+                                  <span>Adicionar</span>
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -454,32 +558,185 @@ export default function PublicCatalogPage() {
         </button>
       )}
 
-      {/* Floating Bottom Action Bar for WhatsApp */}
+      {/* Floating Bottom Action Bar for WhatsApp / Mini-Cart */}
       {settings?.phone && (
         <div className="fixed bottom-0 left-0 right-0 z-40 p-4 pb-6 bg-gradient-to-t from-[#06090e] via-[#06090e]/95 to-transparent backdrop-blur-md">
-          <div className="max-w-md mx-auto">
-            <button
-              onClick={handleShareWhatsApp}
-              className="w-full h-14 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-2xl shadow-emerald-500/25 border border-emerald-300/40 flex items-center justify-between px-5 transition-all duration-200 active:scale-[0.98] group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-slate-950/20 flex items-center justify-center backdrop-blur-sm">
-                  <MessageCircle className="h-5 w-5 fill-slate-950 text-emerald-400" />
+          <div className="max-w-md mx-auto space-y-2">
+            {totalCartItems > 0 ? (
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="w-full h-14 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-2xl shadow-emerald-500/25 border border-emerald-300/40 flex items-center justify-between px-5 transition-all duration-200 active:scale-[0.98] group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative w-10 h-10 rounded-xl bg-slate-950/20 flex items-center justify-center backdrop-blur-sm">
+                    <ShoppingCart className="h-5 w-5 text-slate-950" />
+                    <span className="absolute -top-1.5 -right-1.5 bg-slate-950 text-emerald-400 text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-emerald-400/60 shadow">
+                      {totalCartItems}
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    <span className="block font-black text-xs leading-none">
+                      ORÇAMENTO ({totalCartItems} {totalCartItems === 1 ? 'ITEM' : 'ITENS'})
+                    </span>
+                    <span className="text-[10px] text-slate-900/80 font-bold block mt-0.5">
+                      Toque para revisar ou enviar
+                    </span>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <span className="block font-black text-xs leading-none">
-                    FALAR NO WHATSAPP
-                  </span>
-                  <span className="text-[10px] text-slate-900/80 font-bold block mt-0.5">
-                    Toque aqui para fazer o seu pedido!
-                  </span>
+
+                <div className="w-8 h-8 rounded-xl bg-slate-950/20 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
+                  <ChevronRight className="h-4 w-4 stroke-[3]" />
+                </div>
+              </button>
+            ) : (
+              <button
+                onClick={handleShareWhatsApp}
+                className="w-full h-14 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-2xl shadow-emerald-500/25 border border-emerald-300/40 flex items-center justify-between px-5 transition-all duration-200 active:scale-[0.98] group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-slate-950/20 flex items-center justify-center backdrop-blur-sm">
+                    <MessageCircle className="h-5 w-5 fill-slate-950 text-emerald-400" />
+                  </div>
+                  <div className="text-left">
+                    <span className="block font-black text-xs leading-none">
+                      FALAR NO WHATSAPP
+                    </span>
+                    <span className="text-[10px] text-slate-900/80 font-bold block mt-0.5">
+                      Toque aqui para fazer o seu pedido!
+                    </span>
+                  </div>
+                </div>
+
+                <div className="w-8 h-8 rounded-xl bg-slate-950/20 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
+                  <ChevronRight className="h-4 w-4 stroke-[3]" />
+                </div>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Mini-Carrinho / Drawer Modal de Orçamento */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/80 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="w-full sm:max-w-lg bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-6 duration-200"
+          >
+            {/* Header Modal */}
+            <div className="p-4 px-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <ShoppingCart className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black uppercase text-white tracking-wider">
+                    Orçamento ({totalCartItems})
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Itens selecionados para enviar no WhatsApp
+                  </p>
                 </div>
               </div>
 
-              <div className="w-8 h-8 rounded-xl bg-slate-950/20 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-                <ChevronRight className="h-4 w-4 stroke-[3]" />
+              <div className="flex items-center gap-2">
+                {cartList.length > 0 && (
+                  <button
+                    onClick={handleClearCart}
+                    className="p-2 text-slate-400 hover:text-rose-400 transition-colors"
+                    title="Limpar carrinho"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsCartOpen(false)}
+                  className="p-2 text-slate-400 hover:text-white transition-colors"
+                  title="Fechar"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-            </button>
+            </div>
+
+            {/* Itens List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-2.5 divide-y divide-slate-800/60">
+              {cartList.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 space-y-2">
+                  <ShoppingCart className="h-8 w-8 mx-auto text-slate-600" />
+                  <p className="text-sm font-bold">Nenhum item no orçamento</p>
+                  <p className="text-xs text-slate-500">Adicione produtos do catálogo acima</p>
+                </div>
+              ) : (
+                cartList.map((item) => (
+                  <div key={item.product.id} className="pt-2.5 first:pt-0 flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-bold text-slate-100 uppercase truncate">
+                        {item.product.title || item.product.name}
+                      </h4>
+                      <p className="text-xs font-semibold text-emerald-400 mt-0.5">
+                        {formatCurrency(Number(item.product.price) || 0)} cada
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center bg-slate-950 border border-slate-700 rounded-xl p-0.5">
+                        <button
+                          onClick={() => handleUpdateQuantity(item.product.id, -1)}
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95 transition-all"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="w-6 text-center text-xs font-black text-emerald-400">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => handleUpdateQuantity(item.product.id, 1)}
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95 transition-all"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => handleRemoveFromCart(item.product.id)}
+                        className="p-1.5 text-slate-500 hover:text-rose-400 transition-colors"
+                        title="Remover"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Preview do texto que será enviado */}
+            {cartList.length > 0 && (
+              <div className="p-4 bg-slate-950/80 border-t border-slate-800 space-y-3">
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 space-y-1">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                    Prévia do texto no WhatsApp:
+                  </span>
+                  {cartList.map((item) => (
+                    <div key={item.product.id} className="text-emerald-300">
+                      - {item.quantity}x {item.product.title || item.product.name}
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    handleSendCartWhatsApp();
+                    setIsCartOpen(false);
+                  }}
+                  className="w-full h-12 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                >
+                  <MessageCircle className="h-5 w-5 fill-slate-950 text-emerald-400" />
+                  <span>Mandar Orçamento no WhatsApp</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
