@@ -155,15 +155,26 @@ export default function PublicCatalogPage() {
     });
   };
 
+  // Monitorar se a rolagem passou do cabeçalho para fixar a barra
+  const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 300) {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      if (scrollY > 300) {
         setShowScrollTop(true);
       } else {
         setShowScrollTop(false);
       }
+
+      // Ativar modo fixo quando passar do banner/cabeçalho (~220px)
+      if (scrollY > 220) {
+        setIsHeaderScrolled(true);
+      } else {
+        setIsHeaderScrolled(false);
+      }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
