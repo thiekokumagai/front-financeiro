@@ -81,7 +81,11 @@ export function ProductDetailsForm({
                     <FormControl>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
-                        <Input inputMode="decimal"
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           className="h-12 rounded-2xl bg-background pl-9"
                           placeholder="0,00"
                           value={field.value !== undefined && field.value !== null && !isNaN(Number(field.value)) ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value)) : ""}
@@ -107,6 +111,10 @@ export function ProductDetailsForm({
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
                         <Input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           className="h-12 rounded-2xl bg-background pl-9"
                           placeholder="0,00"
                           value={field.value !== undefined && field.value !== null && !isNaN(Number(field.value)) ? new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(field.value)) : ""}

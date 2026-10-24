@@ -121,6 +121,10 @@ export function CustomerSearch({ selectedCustomer, onSelectCustomer }: CustomerS
         <div className="space-y-1">
           <label className="text-xs font-semibold text-slate-700">Telefone / WhatsApp *</label>
           <Input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="tel"
             placeholder="(00) 00000-0000"
             value={customerPhone}
             onChange={(e) => handlePhoneChange(e.target.value)}

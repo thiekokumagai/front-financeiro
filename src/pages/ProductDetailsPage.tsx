@@ -326,9 +326,12 @@ export default function ProductDetailsPage() {
                       <Label htmlFor="costPrice" className="text-sm font-medium">Preço de custo (R$)</Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                        <Input inputMode="decimal"
+                        <Input
                           id="costPrice"
                           type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           placeholder="0,00"
                           value={
                             field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
@@ -353,9 +356,12 @@ export default function ProductDetailsPage() {
                       <Label htmlFor="price" className="text-sm font-medium">Preço de venda (R$)</Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                        <Input inputMode="decimal"
+                        <Input
                           id="price"
                           type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           placeholder="0,00"
                           value={
                             field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
@@ -511,11 +517,16 @@ export default function ProductDetailsPage() {
                             {currentStock}
                           </span>
                         </div>
-                        <Input inputMode="numeric"
-                          type="number"
-                          min="0"
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           value={stockAdjQuantity}
-                          onChange={(e) => setStockAdjQuantity(e.target.value)}
+                          onChange={(e) => {
+                            const digits = e.target.value.replace(/\D/g, "");
+                            setStockAdjQuantity(digits);
+                          }}
                           placeholder="0"
                           className="h-10 rounded-xl"
                         />
