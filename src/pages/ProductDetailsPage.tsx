@@ -222,21 +222,21 @@ export default function ProductDetailsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
           <div className="flex items-center space-x-2">
             <Switch
               id="product-active"
               checked={isVisible}
               onCheckedChange={setIsVisible}
             />
-            <Label htmlFor="product-active" className="cursor-pointer font-semibold">
+            <Label htmlFor="product-active" className="cursor-pointer font-semibold text-sm">
               {isVisible ? "Ativo" : "Inativo"}
             </Label>
           </div>
 
           <Button
             type="button"
-            className="h-12 rounded-2xl px-8 font-semibold shadow-lg transition-all hover:scale-[1.02]"
+            className="w-full sm:w-auto h-12 rounded-2xl px-8 font-semibold shadow-lg transition-all hover:scale-[1.02] bg-emerald-600 hover:bg-emerald-700 text-white"
             disabled={isSaving}
             onClick={form.handleSubmit((v) => saveMutation.mutate(v))}
           >
