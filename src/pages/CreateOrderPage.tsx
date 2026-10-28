@@ -285,8 +285,8 @@ export default function CreateOrderPage() {
 
       const parsedChangeFor = parseFloat(changeFor.replace(/\./g, '').replace(',', '.'));
       const isCash = paymentMethod === 'Dinheiro' || paymentMethod === 'cash';
-      const amountProvidedVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > 0 ? parsedChangeFor : (isCash ? finalTotal : undefined);
-      const changeAmountVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > finalTotal ? Math.round((parsedChangeFor - finalTotal) * 100) / 100 : undefined;
+      const amountProvidedVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > 0 ? Number(parsedChangeFor.toFixed(2)) : (isCash ? Number(finalTotal.toFixed(2)) : undefined);
+      const changeAmountVal = isCash && needsChange && !isNaN(parsedChangeFor) && parsedChangeFor > finalTotal ? Number(Math.max(0, parsedChangeFor - finalTotal).toFixed(2)) : undefined;
 
       const expectedTotalBeforeCustom = total;
       const diff = Math.round((finalTotal - expectedTotalBeforeCustom) * 100) / 100;
@@ -301,9 +301,9 @@ export default function CreateOrderPage() {
       const payload = {
         customerName: finalCustomerName,
         customerPhone: finalCustomerPhone,
-        itemsTotal: subtotal,
-        totalOrder: finalTotal,
-        totalReceived: isPaid ? finalTotal : 0,
+        itemsTotal: Number(subtotal.toFixed(2)),
+        totalOrder: Number(finalTotal.toFixed(2)),
+        totalReceived: isPaid ? Number(finalTotal.toFixed(2)) : 0,
         paymentType: paymentMethod === 'PIX' ? 'online' : 'entrega',
         paymentMethod: paymentMethod === 'PIX' ? 'pix' : paymentMethod === 'Cartão de Crédito' ? 'credit' : paymentMethod === 'Cartão de Débito' ? 'debit' : paymentMethod === 'Dinheiro' ? 'cash' : paymentMethod,
         paymentStatus: isPaid ? "PAID" : "PENDING",
