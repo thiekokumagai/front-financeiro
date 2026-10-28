@@ -115,11 +115,13 @@ export function ProductStockEditor({
                     </span>
                   </div>
                 ) : null}
-                <Input inputMode="numeric"
-                  type="number"
-                  min="0"
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="tel"
                   value={directStockValue}
-                  onChange={(event) => onDirectStockChange(event.target.value)}
+                  onChange={(event) => onDirectStockChange(event.target.value.replace(/\D/g, ""))}
                   placeholder="0"
                   className="h-10 rounded-xl"
                 />
@@ -175,11 +177,13 @@ export function ProductStockEditor({
 
                   <div>
                     <p className="mb-2 text-sm font-medium">Quantidade</p>
-                    <Input inputMode="numeric"
-                      type="number"
-                      min="0"
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      autoComplete="tel"
                       value={rawValue}
-                      onChange={(event) => onValueChange(item.id, event.target.value)}
+                      onChange={(event) => onValueChange(item.id, event.target.value.replace(/\D/g, ""))}
                       placeholder="0"
                       className="h-10 rounded-xl"
                     />

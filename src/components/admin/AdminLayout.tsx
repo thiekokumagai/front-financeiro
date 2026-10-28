@@ -29,8 +29,22 @@ export function AdminLayout() {
   const [renewalWarning, setRenewalWarning] = useState<{ daysLeft: number } | null>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
     const mainEl = document.querySelector("main");
+    
+    // Se estiver voltando para /clientes, tentar restaurar o scroll salvo
+    if (location.pathname === "/clientes") {
+      const savedScroll = sessionStorage.getItem("scroll_pos_/clientes");
+      if (savedScroll !== null) {
+        const top = parseInt(savedScroll, 10);
+        setTimeout(() => {
+          if (mainEl) mainEl.scrollTop = top;
+          window.scrollTo(0, top);
+        }, 50);
+        return;
+      }
+    }
+
+    window.scrollTo(0, 0);
     if (mainEl) mainEl.scrollTop = 0;
   }, [location.pathname]);
 

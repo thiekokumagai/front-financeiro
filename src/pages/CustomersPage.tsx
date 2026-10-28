@@ -3,9 +3,10 @@ import { useInfiniteCustomers } from "@/hooks/useCustomers";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2, Users, ArrowRight, X } from "lucide-react";
+import { Search, Loader2, Users, ArrowRight, X, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatPhone } from "@/utils/formatters";
+import { openWhatsApp } from "@/utils/whatsapp";
 
 export default function CustomersPage() {
   const [search, setSearch] = useState("");
@@ -17,6 +18,49 @@ export default function CustomersPage() {
   const customers = paginatedData?.pages.flatMap(p => p.data || []) || [];
 
   const loaderRef = useRef<HTMLDivElement>(null);
+
+  // Monitorar e salvar posição do scroll para restaurar ao voltar
+  useEffect(() => {
+    const mainEl = document.querySelector("main");
+    
+    // Tentar restaurar o scroll salvo se houver
+    const saved = sessionStorage.getItem("scroll_pos_/clientes");
+    if (saved) {
+      const top = parseInt(saved, 10);
+      const applyScroll = () => {
+        if (mainEl) mainEl.scrollTop = top;
+        window.scrollTo(0, top);
+      };
+      applyScroll();
+      requestAnimationFrame(applyScroll);
+      setTimeout(applyScroll, 50);
+      setTimeout(applyScroll, 150);
+    }
+
+    const handleScroll = () => {
+      const pos = mainEl && mainEl.scrollTop > 0 ? mainEl.scrollTop : window.scrollY;
+      if (pos > 0) {
+        sessionStorage.setItem("scroll_pos_/clientes", pos.toString());
+      }
+    };
+
+    if (mainEl) {
+      mainEl.addEventListener("scroll", handleScroll, { passive: true });
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      if (mainEl) mainEl.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [customers.length]);
+
+  const handleCustomerClick = (customerId: string) => {
+    const mainEl = document.querySelector("main");
+    const currentScroll = mainEl && mainEl.scrollTop > 0 ? mainEl.scrollTop : window.scrollY;
+    sessionStorage.setItem("scroll_pos_/clientes", currentScroll.toString());
+    navigate(`/clientes/${customerId}`);
+  };
 
   useEffect(() => {
     const loader = loaderRef.current;
@@ -97,7 +141,7 @@ export default function CustomersPage() {
             {customers.map((customer) => (
               <div 
                 key={customer.id} 
-                onClick={() => navigate(`/clientes/${customer.id}`)}
+                onClick={() => handleCustomerClick(customer.id)}
                 className="bg-white rounded-xl border border-slate-200/60 p-4 shadow-sm flex items-center justify-between active:bg-violet-50/40 cursor-pointer"
               >
                 <div className="flex flex-col">
@@ -105,8 +149,24 @@ export default function CustomersPage() {
                   <span className="font-mono text-slate-500 text-xs">{formatPhone(customer.phone)}</span>
                   <span className="text-slate-400 text-[10px] mt-1">Cadastro: {new Date(customer.createdAt).toLocaleDateString("pt-BR")}</span>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400">
-                  <ArrowRight className="h-4 w-4" />
+                <div className="flex items-center gap-2">
+                  {customer.phone && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openWhatsApp({
+                          phone: customer.phone,
+                        });
+                      }}
+                      title="Chamar no WhatsApp"
+                      className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 hover:bg-emerald-100 transition-colors"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </button>
+                  )}
+                  <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400">
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -127,7 +187,7 @@ export default function CustomersPage() {
               {customers.map((customer) => (
                 <TableRow 
                   key={customer.id} 
-                  onClick={() => navigate(`/clientes/${customer.id}`)}
+                  onClick={() => handleCustomerClick(customer.id)}
                   className="group cursor-pointer hover:bg-violet-50/40 transition-colors"
                 >
                   <TableCell className="pl-6">
@@ -142,8 +202,24 @@ export default function CustomersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white group-hover:border-violet-600 transition-all shrink-0">
-                      <ArrowRight className="h-4 w-4" />
+                    <div className="flex items-center gap-2 justify-end pr-2">
+                      {customer.phone && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openWhatsApp({
+                              phone: customer.phone,
+                            });
+                          }}
+                          title="Conversar no WhatsApp"
+                          className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shrink-0"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </button>
+                      )}
+                      <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white group-hover:border-violet-600 transition-all shrink-0">
+                        <ArrowRight className="h-4 w-4" />
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>

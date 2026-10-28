@@ -222,21 +222,21 @@ export default function ProductDetailsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
           <div className="flex items-center space-x-2">
             <Switch
               id="product-active"
               checked={isVisible}
               onCheckedChange={setIsVisible}
             />
-            <Label htmlFor="product-active" className="cursor-pointer font-semibold">
+            <Label htmlFor="product-active" className="cursor-pointer font-semibold text-sm">
               {isVisible ? "Ativo" : "Inativo"}
             </Label>
           </div>
 
           <Button
             type="button"
-            className="h-12 rounded-2xl px-8 font-semibold shadow-lg transition-all hover:scale-[1.02]"
+            className="w-full sm:w-auto h-12 rounded-2xl px-8 font-semibold shadow-lg transition-all hover:scale-[1.02] bg-emerald-600 hover:bg-emerald-700 text-white"
             disabled={isSaving}
             onClick={form.handleSubmit((v) => saveMutation.mutate(v))}
           >
@@ -326,9 +326,12 @@ export default function ProductDetailsPage() {
                       <Label htmlFor="costPrice" className="text-sm font-medium">Preço de custo (R$)</Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                        <Input inputMode="decimal"
+                        <Input
                           id="costPrice"
                           type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           placeholder="0,00"
                           value={
                             field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
@@ -353,9 +356,12 @@ export default function ProductDetailsPage() {
                       <Label htmlFor="price" className="text-sm font-medium">Preço de venda (R$)</Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">R$</span>
-                        <Input inputMode="decimal"
+                        <Input
                           id="price"
                           type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           placeholder="0,00"
                           value={
                             field.value !== undefined && field.value !== null && field.value !== "" && !isNaN(Number(field.value))
@@ -511,11 +517,16 @@ export default function ProductDetailsPage() {
                             {currentStock}
                           </span>
                         </div>
-                        <Input inputMode="numeric"
-                          type="number"
-                          min="0"
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
                           value={stockAdjQuantity}
-                          onChange={(e) => setStockAdjQuantity(e.target.value)}
+                          onChange={(e) => {
+                            const digits = e.target.value.replace(/\D/g, "");
+                            setStockAdjQuantity(digits);
+                          }}
                           placeholder="0"
                           className="h-10 rounded-xl"
                         />
