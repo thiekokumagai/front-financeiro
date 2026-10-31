@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Search, ArrowRight, Loader2, Calendar, ShoppingBag, X, Plus } from "lucide-react";
 import OrderDetailDrawer from "@/components/OrderDetailDrawer";
+import { PaymentStatusButton } from "@/components/orders/PaymentStatusButton";
 import { OrderStatus, PaymentStatus } from "@/types/order";
 import { io } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -527,21 +528,17 @@ export default function OrdersPage() {
                       <div className="flex flex-col gap-1">
                         <span className="text-[10px] uppercase font-bold text-slate-400">Pagamento</span>
                         <div className="flex flex-col gap-0.5 items-start">
-                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                             {order.status === 'CANCELLED' ? (
                               <Badge className="bg-rose-100 text-rose-700 shadow-none font-bold rounded-full text-[10px] px-2 py-0 border-0">Cancelado</Badge>
                             ) : (
-                              <>
-                                <Badge className={`${paymentStatusConfig[order.paymentStatus || 'PENDING'].bg} shadow-none font-bold rounded-full text-[10px] px-2 py-0 border-0`}>
-                                  {paymentStatusConfig[order.paymentStatus || 'PENDING'].label}
-                                </Badge>
-                                <Select value={order.paymentStatus || 'PENDING'} onValueChange={(val) => handleUpdatePaymentStatus(order.id, val as PaymentStatus)}>
-                                  <SelectTrigger className="h-5 w-5 p-0 border-0 bg-transparent focus:ring-0 shadow-none">
-                                    <ArrowRight className="h-3 w-3 rotate-90 text-slate-400" />
-                                  </SelectTrigger>
-                                  <SelectContent><SelectItem value="PENDING">Pendente</SelectItem><SelectItem value="PAID">Pago</SelectItem></SelectContent>
-                                </Select>
-                              </>
+                              <PaymentStatusButton
+                                paymentStatus={order.paymentStatus}
+                                isUpdating={updateStatusMutation.isPending && (updateStatusMutation.variables as any)?.id === order.id}
+                                disabled={order.status === 'CANCELLED'}
+                                onToggle={() => handleUpdatePaymentStatus(order.id, order.paymentStatus === 'PAID' ? 'PENDING' : 'PAID')}
+                                size="sm"
+                              />
                             )}
                           </div>
                           {order.paymentMethod && (
@@ -553,20 +550,19 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex flex-col gap-1">
                         <span className="text-[10px] uppercase font-bold text-slate-400">Entrega</span>
-                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                          <Badge className={`${statusConfig[order.status].bg} shadow-none font-bold rounded-full text-[10px] px-2 py-0 border-0`}>
-                            {statusConfig[order.status].label}
-                          </Badge>
+                        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                           <Select value={order.status} onValueChange={(val) => handleUpdateStatus(order.id, val as OrderStatus)}>
-                            <SelectTrigger className="h-5 w-5 p-0 border-0 bg-transparent focus:ring-0 shadow-none">
-                              <ArrowRight className="h-3 w-3 rotate-90 text-slate-400" />
+                            <SelectTrigger 
+                              className={`inline-flex items-center gap-1 h-auto py-0.5 px-2.5 rounded-full text-[11px] font-bold border-0 cursor-pointer shadow-none transition-all hover:opacity-85 focus:ring-1 focus:ring-slate-300 w-auto ${statusConfig[order.status]?.bg || "bg-slate-100 text-slate-700"}`}
+                            >
+                              <span>{statusConfig[order.status]?.label || order.status}</span>
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="PENDING">Pendente</SelectItem>
-                              <SelectItem value="CONFIRMED">Separado</SelectItem>
-                              <SelectItem value="DISPATCHED">Enviado</SelectItem>
-                              <SelectItem value="COMPLETED">Entregue</SelectItem>
-                              <SelectItem value="CANCELLED" disabled={order.paymentStatus === 'PAID'}>Cancelado</SelectItem>
+                            <SelectContent className="rounded-xl border-slate-200 shadow-lg min-w-[130px]">
+                              <SelectItem value="PENDING" className="font-semibold cursor-pointer">Pendente</SelectItem>
+                              <SelectItem value="CONFIRMED" className="font-semibold cursor-pointer">Separado</SelectItem>
+                              <SelectItem value="DISPATCHED" className="font-semibold cursor-pointer">Enviado</SelectItem>
+                              <SelectItem value="COMPLETED" className="font-semibold cursor-pointer">Entregue</SelectItem>
+                              <SelectItem value="CANCELLED" disabled={order.paymentStatus === 'PAID'} className="font-semibold cursor-pointer text-rose-600 focus:text-rose-700">Cancelado</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -633,45 +629,34 @@ export default function OrdersPage() {
                               Cancelado
                             </Badge>
                           ) : (
-                            <div className="flex items-center gap-2">
-                              <Badge className={`${paymentStatusConfig[order.paymentStatus || 'PENDING'].bg} shadow-none font-bold rounded-full text-[12px] px-2.5 py-0.5 border-0`}>
-                                {paymentStatusConfig[order.paymentStatus || 'PENDING'].label}
-                              </Badge>
-                              <Select 
-                                value={order.paymentStatus || 'PENDING'} 
-                                onValueChange={(val) => handleUpdatePaymentStatus(order.id, val as PaymentStatus)}
-                              >
-                                <SelectTrigger className="h-6 w-6 p-0 border-0 bg-transparent focus:ring-0 shadow-none">
-                                  <ArrowRight className="h-3 w-3 rotate-90 text-slate-400" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="PENDING">Pendente</SelectItem>
-                                  <SelectItem value="PAID">Pago</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
+                            <PaymentStatusButton
+                              paymentStatus={order.paymentStatus}
+                              isUpdating={updateStatusMutation.isPending && (updateStatusMutation.variables as any)?.id === order.id}
+                              disabled={order.status === 'CANCELLED'}
+                              onToggle={() => handleUpdatePaymentStatus(order.id, order.paymentStatus === 'PAID' ? 'PENDING' : 'PAID')}
+                              size="default"
+                            />
                           )}
                           <span className="text-[11px] text-slate-400 font-medium">{paymentLabels[order.paymentMethod] || order.paymentMethod}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                          <Badge className={`${statusConfig[order.status].bg} shadow-none font-bold rounded-full text-[12px] px-2.5 py-0.5 border-0`}>
-                            {statusConfig[order.status].label}
-                          </Badge>
+                        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                           <Select 
                             value={order.status} 
                             onValueChange={(val) => handleUpdateStatus(order.id, val as OrderStatus)}
                           >
-                            <SelectTrigger className="h-6 w-6 p-0 border-0 bg-transparent focus:ring-0 shadow-none">
-                              <ArrowRight className="h-3 w-3 rotate-90 text-slate-400" />
+                            <SelectTrigger 
+                              className={`inline-flex items-center gap-1.5 h-auto py-1 px-3 rounded-full text-xs font-bold border-0 cursor-pointer shadow-none transition-all hover:opacity-85 focus:ring-2 focus:ring-offset-1 focus:ring-slate-300 w-auto ${statusConfig[order.status]?.bg || "bg-slate-100 text-slate-700"}`}
+                            >
+                              <span>{statusConfig[order.status]?.label || order.status}</span>
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="PENDING">Pendente</SelectItem>
-                              <SelectItem value="CONFIRMED">Separado</SelectItem>
-                              <SelectItem value="DISPATCHED">Enviado</SelectItem>
-                              <SelectItem value="COMPLETED">Entregue</SelectItem>
-                              <SelectItem value="CANCELLED" disabled={order.paymentStatus === 'PAID'}>Cancelado</SelectItem>
+                            <SelectContent className="rounded-xl border-slate-200 shadow-lg min-w-[140px]">
+                              <SelectItem value="PENDING" className="font-semibold cursor-pointer">Pendente</SelectItem>
+                              <SelectItem value="CONFIRMED" className="font-semibold cursor-pointer">Separado</SelectItem>
+                              <SelectItem value="DISPATCHED" className="font-semibold cursor-pointer">Enviado</SelectItem>
+                              <SelectItem value="COMPLETED" className="font-semibold cursor-pointer">Entregue</SelectItem>
+                              <SelectItem value="CANCELLED" disabled={order.paymentStatus === 'PAID'} className="font-semibold cursor-pointer text-rose-600 focus:text-rose-700">Cancelado</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
