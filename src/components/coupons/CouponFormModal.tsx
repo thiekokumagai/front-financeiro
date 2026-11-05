@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -205,11 +206,10 @@ export default function CouponFormModal({ isOpen, onClose, coupon }: Props) {
 
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="validUntilDate" className="text-slate-700 font-bold">Data de Validade</Label>
-                <Input inputMode="numeric" 
-                  id="validUntilDate" 
-                  type="date" 
+                <DatePicker
+                  id="validUntilDate"
                   value={validUntilDate}
-                  onChange={(e) => setValidUntilDate(e.target.value)}
+                  onChange={setValidUntilDate}
                   className="h-11 rounded-xl border-slate-200 focus-visible:ring-violet-600 font-medium"
                 />
               </div>

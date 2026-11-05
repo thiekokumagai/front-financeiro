@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Table,
   TableBody,
@@ -231,24 +232,18 @@ export default function CashRegistersPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Data de Início</Label>
-                <Input
-                  type="date"
+                <DatePicker
                   required
                   value={formData.startDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startDate: e.target.value })
-                  }
+                  onChange={(v) => setFormData({ ...formData, startDate: v })}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Data de Fim</Label>
-                <Input
-                  type="date"
+                <DatePicker
                   required
                   value={formData.endDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endDate: e.target.value })
-                  }
+                  onChange={(v) => setFormData({ ...formData, endDate: v })}
                 />
               </div>
             </div>

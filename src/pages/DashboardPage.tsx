@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   DollarSign,
   ShoppingBag,
@@ -329,21 +330,19 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-muted-foreground">Data Inicial</label>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={customStart}
-                        onChange={(e) => setCustomStart(e.target.value)}
-                        className="w-full bg-background border border-input rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        onChange={setCustomStart}
+                        className="rounded-xl text-sm"
                         required
                       />
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-muted-foreground">Data Final</label>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={customEnd}
-                        onChange={(e) => setCustomEnd(e.target.value)}
-                        className="w-full bg-background border border-input rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        onChange={setCustomEnd}
+                        className="rounded-xl text-sm"
                         required
                       />
                     </div>
