@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { BestSellerItem, BestSellerSort } from "@/services/dashboard.service";
 import type { CategoryOption } from "@/lib/dashboard-metrics";
-import { buildImageUrl } from "@/utils/image-url";
 import { formatPct } from "@/lib/dashboard-format";
 import { sharePct } from "@/lib/abc";
 import { SORT_OPTIONS, formatMetric, metricOf } from "@/lib/dashboard-metrics";
@@ -115,17 +114,6 @@ export function TopProducts({
                     <span className="w-4 shrink-0 text-center text-xs font-extrabold text-muted-foreground tabular-nums">
                       {idx + 1}
                     </span>
-                    {item.imageUrl ? (
-                      <img
-                        src={buildImageUrl(item.imageUrl)}
-                        alt=""
-                        className="h-10 w-10 rounded-xl object-cover border shrink-0"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground border shrink-0">
-                        <Package className="h-4 w-4" />
-                      </div>
-                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-foreground line-clamp-2 break-words">{item.title}</p>
                       <p className="text-[11px] text-muted-foreground truncate">

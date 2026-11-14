@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { BestSellerItem, BestSellerSort, DashboardKPIs, DashboardMissingCost } from "@/services/dashboard.service";
 import type { CategoryOption } from "@/lib/dashboard-metrics";
-import { buildImageUrl } from "@/utils/image-url";
 import { PRODUCTS_TABLE_LIMIT, useDashboardProducts, type DashboardRange } from "@/hooks/useDashboard";
 import { classifyAbc, sharePct, type AbcClass } from "@/lib/abc";
 import { sortProducts } from "@/lib/products-sort";
@@ -24,16 +23,6 @@ function AbcBadge({ abc }: { abc: AbcClass | undefined }) {
     <span className={`inline-flex h-5 w-5 items-center justify-center rounded-md border text-[11px] font-bold ${ABC_STYLE[abc]}`}>
       {abc}
     </span>
-  );
-}
-
-function ProductThumb({ item }: { item: BestSellerItem }) {
-  return item.imageUrl ? (
-    <img src={buildImageUrl(item.imageUrl)} alt="" className="h-9 w-9 rounded-lg object-cover border shrink-0" />
-  ) : (
-    <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground border shrink-0">
-      <Package className="h-4 w-4" />
-    </div>
   );
 }
 
@@ -157,7 +146,6 @@ export function ProductsTab({ range, stats, missingCost, categories, categoryId,
                         <TableCell className="text-muted-foreground tabular-nums">{idx + 1}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3 min-w-0">
-                            <ProductThumb item={item} />
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-foreground truncate max-w-[280px]">{item.title}</p>
                               <p className="text-[11px] text-muted-foreground truncate">{item.categoryTitle}</p>
@@ -197,8 +185,7 @@ export function ProductsTab({ range, stats, missingCost, categories, categoryId,
               <ul className={`sm:hidden divide-y divide-border transition-opacity ${query.isPlaceholderData ? "opacity-60" : ""}`}>
                 {sorted.map((item, idx) => (
                   <li key={item.id} className="flex items-start gap-3 py-3">
-                    <span className="w-5 pt-2 text-center text-xs font-bold text-muted-foreground tabular-nums">{idx + 1}</span>
-                    <ProductThumb item={item} />
+                    <span className="w-5 pt-0.5 text-center text-xs font-bold text-muted-foreground tabular-nums">{idx + 1}</span>
                     <div className="flex-1 min-w-0 space-y-0.5">
                       <p className="text-xs font-bold text-foreground line-clamp-2 break-words">{item.title}</p>
                       <p className="text-[11px] text-muted-foreground">
