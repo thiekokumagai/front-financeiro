@@ -37,6 +37,10 @@ export type BestSellerSort = "quantity" | "revenue" | "profit" | "margin";
 export interface DashboardChartItem {
   name: string;
   vendas: number;
+  /** Lucro bruto do ponto (só itens com custo cadastrado). */
+  lucro: number;
+  /** Faturamento do ponto equivalente no período anterior; ausente sem comparação. */
+  vendasAnterior?: number;
 }
 
 export interface BestSellerItem {
@@ -85,13 +89,16 @@ export async function getDashboardStats(
   startDate?: string,
   endDate?: string,
   categoryId?: string,
-  sortBy: BestSellerSort = "quantity"
+  sortBy: BestSellerSort = "quantity",
+  options: { limit?: number; compare?: boolean } = {}
 ): Promise<DashboardStatsResponse> {
   const queryParams = new URLSearchParams();
   if (startDate) queryParams.append("startDate", startDate);
   if (endDate) queryParams.append("endDate", endDate);
   if (categoryId) queryParams.append("categoryId", categoryId);
   queryParams.append("sortBy", sortBy);
+  if (options.limit) queryParams.append("limit", String(options.limit));
+  if (options.compare === false) queryParams.append("compare", "false");
 
   const response = await apiFetch(`/dashboard/stats?${queryParams.toString()}`);
   return response.json();

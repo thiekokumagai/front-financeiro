@@ -1,34 +1,13 @@
-import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, RefreshCw, TrendingUp, TrendingDown, Wallet, Scale, PiggyBank } from "lucide-react";
+import { ArrowRight, TrendingUp, TrendingDown, Wallet, Scale, PiggyBank } from "lucide-react";
 import { useStoreDiagnosis } from "@/hooks/useStoreDiagnosis";
 import type { DiagnosisItem, DiagnosisSeverity } from "@/services/dashboard.service";
-
-type Period = "7days" | "30days" | "6months" | "year";
-
-const PERIODS: { id: Period; label: string }[] = [
-  { id: "7days", label: "7 dias" },
-  { id: "30days", label: "30 dias" },
-  { id: "6months", label: "6 meses" },
-  { id: "year", label: "Ano" },
-];
+import type { DashboardRange } from "@/hooks/useDashboard";
 
 const formatBRL = (v: number) =>
   `R$ ${(v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-// Mesmo padrão do filtro de vendas deste sistema: instantes ISO de meia-noite e 23:59:59.999 locais.
-function getPeriodDates(period: Period) {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-  if (period === "7days") start.setDate(start.getDate() - 6);
-  else if (period === "30days") start.setDate(start.getDate() - 29);
-  else if (period === "6months") start.setMonth(start.getMonth() - 6);
-  else start.setFullYear(start.getFullYear() - 1);
-  return { start: start.toISOString(), end: end.toISOString() };
-}
 
 const SEVERITY_STYLE: Record<DiagnosisSeverity, { dot: string; badge: string; label: string }> = {
   critical: { dot: "bg-rose-500", badge: "bg-rose-50 text-rose-700 border-rose-200", label: "Crítico" },
@@ -74,11 +53,10 @@ function DiagnosisRow({ item, onAction }: { item: DiagnosisItem; onAction: (url:
   );
 }
 
-export function DiagnosisTab() {
+/** Diagnóstico do período escolhido no topo do Dashboard (o mesmo das outras abas). */
+export function DiagnosisTab({ range }: { range: DashboardRange | null }) {
   const navigate = useNavigate();
-  const [period, setPeriod] = useState<Period>("30days");
-  const { start, end } = useMemo(() => getPeriodDates(period), [period]);
-  const { data, isLoading, isFetching, isError, refetch } = useStoreDiagnosis(start, end);
+  const { data, isLoading, isError } = useStoreDiagnosis(range);
 
   const problems = data?.itens.filter((i) => i.severity !== "ok") ?? [];
   const okItems = data?.itens.filter((i) => i.severity === "ok") ?? [];
@@ -115,37 +93,10 @@ export function DiagnosisTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-muted rounded-xl border border-border w-fit">
-          {PERIODS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setPeriod(p.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                period === p.id
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground"
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="rounded-xl border border-border"
-        >
-          <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-        </Button>
-      </div>
-
       {isError && (
         <Card className="border border-rose-200 bg-rose-50 rounded-2xl">
           <CardContent className="p-4 text-xs text-rose-800">
-            Não foi possível carregar o diagnóstico. Tente atualizar.
+            Não foi possível carregar o diagnóstico. Tente atualizar (botão no topo).
           </CardContent>
         </Card>
       )}
