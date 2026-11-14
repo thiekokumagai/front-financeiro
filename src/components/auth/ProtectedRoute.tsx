@@ -1,6 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { isAuthenticated, getUserRole } from "@/lib/auth";
-import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 
 interface ProtectedRouteProps {
   allowedRoles?: Array<"SUPER_ADMIN" | "ADMIN">;
@@ -21,10 +20,5 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps = {}) {
     }
   }
 
-  return (
-    <>
-      <PWAUpdatePrompt />
-      <Outlet />
-    </>
-  );
+  return <Outlet />;
 }

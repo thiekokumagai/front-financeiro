@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
+import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const SuperAdminDashboardPage = lazy(() => import("@/pages/SuperAdminDashboardPage"));
@@ -62,6 +63,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <SonnerToaster />
+      {/* Montado uma vez só, fora das rotas: aparece em qualquer tela (inclusive impressão e super-admin) sem duplicar */}
+      <PWAUpdatePrompt />
       <BrowserRouter>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
