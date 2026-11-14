@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   PiggyBank,
   Percent,
+  Stethoscope,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import {
@@ -33,12 +34,13 @@ import { getCategories } from "@/services/category.service";
 import type { CategoryList } from "@/types/category";
 import { buildImageUrl } from "@/utils/image-url";
 import { Button } from "@/components/ui/button";
+import { DiagnosisTab } from "@/components/admin/DiagnosisTab";
 import { useSettings } from "@/hooks/useSettings";
 import { OnboardingWidget } from "@/components/admin/OnboardingWidget";
 import { useOrders } from "@/hooks/useOrders";
 
 type FilterType = "today" | "7days" | "30days" | "6months" | "year" | "custom";
-type ActiveTab = "vendas" | "estoque";
+type ActiveTab = "vendas" | "estoque" | "diagnostico";
 
 const formatBRL = (v: number) =>
   `R$ ${(v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
@@ -261,6 +263,7 @@ export default function DashboardPage() {
   const tabs: { id: ActiveTab; label: string; icon: React.ElementType }[] = [
     { id: "vendas", label: "Visão Geral de Vendas", icon: BarChart2 },
     { id: "estoque", label: "Estoque & Risco", icon: AlertTriangle },
+    { id: "diagnostico", label: "Diagnóstico", icon: Stethoscope },
   ];
 
   return (
@@ -580,6 +583,9 @@ export default function DashboardPage() {
       )}
 
       {/* ─── TAB 2: ESTOQUE & RISCO ────────────────────────────────────────── */}
+      {/* ─── TAB: DIAGNÓSTICO ───────────────────────────────────────────── */}
+      {activeTab === "diagnostico" && <DiagnosisTab />}
+
       {activeTab === "estoque" && (
         <div className="space-y-6">
           {/* Refresh button */}
