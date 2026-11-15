@@ -269,6 +269,7 @@ export default function CustomerDetailsPage() {
           isOpen={!!selectedOrderId}
           onClose={() => setSelectedOrderId(null)}
           readOnly={true}
+          allowReceive
         />
       </div>
   );

@@ -29,7 +29,10 @@ interface OrderDetailDrawerProps {
   orderId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  /** Só leitura: sem trocar status, cancelar, Uber nem editar o pedido. */
   readOnly?: boolean;
+  /** Com readOnly, ainda deixa RECEBER o pagamento (usado nos detalhes do cliente). */
+  allowReceive?: boolean;
 }
 
 const statusConfig: Record<OrderStatus, { label: string; bg: string; text: string }> = {
@@ -60,7 +63,9 @@ const paymentLabels: Record<string, string> = {
   Dinheiro: "Dinheiro",
 };
 
-export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly = false }: OrderDetailDrawerProps) {
+export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly = false, allowReceive = false }: OrderDetailDrawerProps) {
+  // Campos de recebimento (forma de pagamento, descontos, total recebido) só ficam travados em leitura SEM allowReceive
+  const paymentLocked = readOnly && !allowReceive;
   const { toast } = useToast();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
@@ -764,14 +769,14 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                           const digits = e.target.value.replace(/\D/g, "");
                           handleDiscountChange(Number(digits) / 100);
                         }}
-                        disabled={readOnly || order.status === "CANCELLED"}
+                        disabled={paymentLocked || order.status === "CANCELLED"}
                       />
                     </div>
                   )}
                 </div>
                 <div className="flex justify-between text-slate-500 items-center">
                   <span>Acréscimo Recebimento</span>
-                  {isPaid || readOnly ? (
+                  {isPaid || paymentLocked ? (
                     <span className="font-semibold text-slate-700 pr-1">{formatCurrency(surcharge)}</span>
                   ) : (
                     <div className="relative w-32">
@@ -783,7 +788,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                           const digits = e.target.value.replace(/\D/g, "");
                           handleSurchargeChange(Number(digits) / 100);
                         }}
-                        disabled={readOnly || order.status === "CANCELLED"}
+                        disabled={paymentLocked || order.status === "CANCELLED"}
                       />
                     </div>
                   )}
@@ -794,7 +799,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                 </div>
                 <div className="flex justify-between font-bold text-emerald-600 bg-emerald-50/50 p-2 rounded-lg mt-1 items-center">
                   <span>Total recebido</span>
-                  {isPaid || readOnly ? (
+                  {isPaid || paymentLocked ? (
                     <span className="font-bold text-emerald-700 pr-1">{formatCurrency(totalReceived)}</span>
                   ) : (
                     <div className="relative w-32">
@@ -806,7 +811,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                           const digits = e.target.value.replace(/\D/g, "");
                           handleTotalChange(Number(digits) / 100);
                         }}
-                        disabled={readOnly || order.status === "CANCELLED"}
+                        disabled={paymentLocked || order.status === "CANCELLED"}
                       />
                     </div>
                   )}
@@ -826,7 +831,7 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
                 </div>
                 <div className="flex justify-between text-slate-500 items-center">
                   <span>Forma de pagamento</span>
-                  {isPaid || readOnly ? (
+                  {isPaid || paymentLocked ? (
                     <span className="font-bold text-slate-800">{paymentLabels[paymentMethod] || "-"}</span>
                   ) : (
                     <Select 
@@ -937,6 +942,23 @@ export default function OrderDetailDrawer({ orderId, isOpen, onClose, readOnly =
 
             {/* Footer Buttons aligned side-by-side */}
             <div className="flex flex-col sm:flex-row gap-3 p-4 sm:p-6 border-t border-slate-200/80 bg-slate-50 shrink-0">
+              {readOnly && allowReceive && order.status !== "CANCELLED" && order.paymentStatus !== "PAID" && (
+                <Button
+                  variant="default"
+                  className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-emerald-100"
+                  disabled={receiveMutation.isPending}
+                  onClick={handleReceiveOrder}
+                >
+                  {receiveMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <span>Processando...</span>
+                    </>
+                  ) : (
+                    <span>Receber Pagamento</span>
+                  )}
+                </Button>
+              )}
               {!readOnly && (
                 <>
                   {order.status !== "CANCELLED" ? (
