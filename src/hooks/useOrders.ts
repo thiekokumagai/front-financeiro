@@ -58,6 +58,8 @@ export function useCancelOrder() {
       queryClient.invalidateQueries({ queryKey: ["orders", id] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["cash-register-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.invalidateQueries({ queryKey: ["customer"] });
     },
   });
 }
@@ -73,6 +75,7 @@ export function useReceiveOrder() {
       queryClient.invalidateQueries({ queryKey: ["cash-register-summary"] });
       // Detalhes do cliente (["customers", id]) trazem a lista de pedidos: o pedido sai dos não pagos
       queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.invalidateQueries({ queryKey: ["customer"] });
     },
   });
 }
@@ -86,6 +89,8 @@ export function useRevertReceiveOrder() {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["orders", id] });
       queryClient.invalidateQueries({ queryKey: ["cash-register-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.invalidateQueries({ queryKey: ["customer"] });
     },
   });
 }

@@ -58,7 +58,7 @@ describe("CustomerDetailsPage: abrir pedido não pago a partir dos detalhes do c
     expect(screen.getByText("Pedido #102")).toBeInTheDocument();
   });
 
-  it("o drawer abre em leitura MAS com allowReceive: dá para receber (era readOnly puro)", () => {
+  it("o drawer abre em leitura MAS com allowReceive e allowCancel: dá para receber e cancelar", () => {
     render(<CustomerDetailsPage />);
     openOrdersTab();
 
@@ -66,7 +66,7 @@ describe("CustomerDetailsPage: abrir pedido não pago a partir dos detalhes do c
 
     expect(screen.getByTestId("drawer")).toHaveTextContent("pedido o-unpaid");
     const last = drawerProps.mock.calls.at(-1)![0];
-    expect(last).toMatchObject({ orderId: "o-unpaid", isOpen: true, readOnly: true, allowReceive: true });
+    expect(last).toMatchObject({ orderId: "o-unpaid", isOpen: true, readOnly: true, allowReceive: true, allowCancel: true });
   });
 
   it("fechar o drawer limpa o pedido selecionado", () => {

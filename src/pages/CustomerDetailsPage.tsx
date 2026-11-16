@@ -270,6 +270,7 @@ export default function CustomerDetailsPage() {
           onClose={() => setSelectedOrderId(null)}
           readOnly={true}
           allowReceive
+          allowCancel
         />
       </div>
   );
