@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { updatePassword } from "@/services/auth.service";
+import { clearSession, updatePassword } from "@/services/auth.service";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -12,6 +14,8 @@ interface ChangePasswordDialogProps {
 }
 
 export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialogProps) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -33,8 +37,12 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
     try {
       setIsLoading(true);
       await updatePassword({ currentPassword, newPassword });
-      toast.success("Senha alterada com sucesso!");
       handleClose();
+      // O servidor encerrou as sessões abertas: entra de novo com a senha nova
+      queryClient.clear();
+      clearSession();
+      toast.success("Senha alterada! Entre novamente com a nova senha.");
+      navigate("/login", { replace: true });
     } catch (error: any) {
       toast.error(error.message || "Não foi possível alterar a senha. Verifique sua senha atual.");
     } finally {
